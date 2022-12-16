@@ -1,0 +1,5 @@
+package: genericpam
+output: handlers.gen.go
+generate:
+  strict-server: true
+  fiber-server: true

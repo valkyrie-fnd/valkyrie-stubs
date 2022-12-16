@@ -1,0 +1,24 @@
+linters:
+  enable:
+    - gocritic
+    - gocyclo
+    - funlen
+    - forbidigo
+    - revive
+issues:
+  exclude-use-default: false
+  exclude-rules:
+    # Exclude some linters from running on tests files.
+    - path: _test\.go
+      linters:
+        - funlen
+        - errcheck
+linters-settings:
+  revive:
+    rules:
+      - name: var-naming # enable this to check for stuff like Xml -> XML naming
+        disabled: true
+      - name: package-comments
+run:
+  skip-dirs:
+    - (^|/)generated($|/)

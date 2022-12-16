@@ -1,0 +1,4 @@
+package: genericpam
+output: model.gen.go
+generate:
+  models: true

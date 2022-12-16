@@ -1,0 +1,71 @@
+# The following example uses anchors and merge directive to avoid
+# a bit of duplicate config, for more information see https://yaml.org/type/merge.html
+
+pamApiToken: pam-api-token
+
+providers:
+  - &provider
+    provider: Evolution
+    providerId: 3
+
+providerApiKeys:
+  - << : *provider
+    apiKey: evo-api-key
+
+providerSessions:
+  - provider: Red Tiger
+    key: RECON_TOKEN
+
+games:
+  - &game
+    providerGameId: vctlz20yfnmp1ylr
+
+gameRounds:
+  - << : *game
+    providerRoundId: vVJBwYIUc5
+    providerName: Evolution
+    playerId: 2000001
+    startTime: 2006-01-02T15:04:05Z
+
+players:
+  - id: 2000001
+    playerIdentifier: 2000001
+  - id: 5000001
+    playerIdentifier: 5000001
+
+accounts:
+  - id: 3
+    playerIdentifier: 2000001
+    currency: SEK
+    country: SE
+    language: sv
+    cashAmount: 100
+    bonusAmount: 10
+    promoAmount: 1
+  - id: 10
+    playerIdentifier: 5000001
+    currency: EUR
+    country: SE
+    language: sv
+    cashAmount: 100
+    bonusAmount: 10
+    promoAmount: 1
+
+sessions:
+  - key: A7eK4bOmC1Ux-hbvdr4bRckEqBPDAGj06aO3bLyAR_g
+    playerIdentifier: 2000001
+    << : *provider
+
+transactions:
+  - playerIdentifier: 2000001
+    cashAmount: 100
+    bonusAmount: 10
+    promoAmount: 1
+    currency: SEK
+    transactionType: DEPOSIT
+    providerTransactionId: 123
+    providerBetRef: 321
+    providerGameId: vctlz20yfnmp1ylr
+    providerRoundId: vVJBwYIUc5
+    providerName: "Evolution"
+    transactionDateTime: 2006-01-02T15:04:05Z

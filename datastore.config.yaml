@@ -1,0 +1,152 @@
+pamApiToken: pam-api-token
+
+providers:
+  - provider: Red Tiger
+    providerId: 2
+  - provider: Evolution
+    providerId: 3
+
+providerApiKeys:
+  - provider: Evolution
+    apiKey: evo-api-key
+  - provider: Red Tiger
+    apiKey: RT_API_KEY
+
+providerSessions:
+  - provider: Red Tiger
+    key: RECON_TOKEN
+
+games:
+  - providerGameId: vctlz20yfnmp1ylr
+  - providerGameId: 100
+  - providerGameId: 1001
+  - providerGameId: DragonsLuck
+
+gameRounds:
+  - providerGameId: vctlz20yfnmp1ylr
+    providerRoundId: vVJBwYIUc5
+    providerName: Evolution
+    playerId: 2000001
+    startTime: 2006-01-02T15:04:05Z
+  - providerGameId: 100
+    providerRoundId: abc
+    providerName: Red Tiger
+    playerId: 1
+    startTime: 2006-01-02T15:04:05Z
+  - providerGameId: 1001
+    providerRoundId: abcd
+    providerName: Red Tiger
+    playerId: 1000001
+    startTime: 2006-01-02T15:04:05Z
+  - providerGameId: DragonsLuck
+    providerRoundId: 456
+    providerName: Red Tiger
+    startTime: 2006-01-02T15:04:05Z
+
+players:
+  - id: 1
+    playerIdentifier: 1
+  - id: 1000001
+    playerIdentifier: 1000001
+  - id: 2000001
+    playerIdentifier: 2000001
+  - id: 5000001
+    playerIdentifier: 5000001
+  - id: 5000002
+    playerIdentifier: 5000002
+
+accounts:
+  - id: 1
+    playerIdentifier: 1
+    currency: SEK
+    country: SE
+    language: sv
+    cashAmount: 100
+  - id: 2
+    playerIdentifier: 1000001
+    currency: USD
+    country: US
+    language: en
+    cashAmount: 1000
+  - id: 3
+    playerIdentifier: 2000001
+    currency: SEK
+    country: SE
+    language: sv
+    cashAmount: 100
+  - id: 4
+    playerIdentifier: 5000001
+    currency: EUR
+    country: SE
+    language: sv
+    cashAmount: 1000
+  - id: 5
+    playerIdentifier: 5000002
+    currency: EUR
+    country: SE
+    language: sv
+    cashAmount: 1000
+
+sessions:
+  - key: ABC
+    playerIdentifier: 1
+    provider: Red Tiger
+    currency: SEK
+    country: SE
+    language: sv
+  - key: pelle1-key-needs-to-be-at-least-32-chars
+    playerIdentifier: 1000001
+    provider: Red Tiger
+    currency: USD
+    country: SE
+    language: sv
+  - key: A7eK4bOmC1Ux-hbvdr4bRckEqBPDAGj06aO3bLyAR_g
+    playerIdentifier: 2000001
+    provider: Evolution
+    currency: SEK
+    country: SE
+    language: sv
+  - key: C1eK4bOmC1Ux-hbvdr4bRckEqBPDAGj06aO3bLyARab
+    playerIdentifier: 5000001
+    provider: Evolution
+    currency: EUR
+    country: SE
+    language: sv
+  - key: B7eK4bOmC1Ux-hbvdr4bRckEqBPDAGj06aO3bLyAR_g
+    playerIdentifier: 5000002
+    provider: Evolution
+    currency: EUR
+    country: SE
+    language: sv
+  - key: DEF
+    playerIdentifier: 5000001
+    provider: Evolution
+    currency: EUR
+    country: SE
+    language: sv
+
+transactions:
+  - playerIdentifier: 1
+    cashAmount: 100
+    currency: SEK
+    transactionType: DEPOSIT
+    providerTransactionId: 123
+    providerBetRef: 123
+    providerGameId: 100
+    providerRoundId: abc
+  - playerIdentifier: 1000001
+    cashAmount: 1000
+    currency: USD
+    transactionType: DEPOSIT
+    providerTransactionId: id123
+    providerBetRef: ref123
+    providerGameId: 1001
+    providerRoundId: abcd
+  - playerIdentifier: 2000001
+    cashAmount: 100
+    currency: SEK
+    transactionType: DEPOSIT
+    providerTransactionId: 123
+    providerBetRef: 123
+    providerGameId: vctlz20yfnmp1ylr
+    providerRoundId: vVJBwYIUc5

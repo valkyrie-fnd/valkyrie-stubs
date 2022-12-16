@@ -1,0 +1,18 @@
+logging:
+  level: info
+providers:
+  - name: Evolution
+    auth:
+      casino_key: ${EVO_CASINO_KEY}
+      api_key: ${EVO_API_TOKEN} # Token for incoming requests
+      casino_token: ${EVO_CASINO_API_TOKEN} # Token for outgoing requests
+    url: ${EVO_BASE_URL}
+  - name: Red Tiger
+    url: ${RT_BASE_URL}
+    auth:
+      recon_token: ${RT_RECON_TOKEN}
+      api_key: RT_API_KEY
+pam:
+  url: ${PAM_URL}
+  api_key: ${PAM_API_KEY}
+
