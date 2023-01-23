@@ -149,6 +149,7 @@ func Test_checkPlayerId(t *testing.T) {
 		})
 	}
 }
+
 func Test_checkProvider(t *testing.T) {
 	tests := []struct {
 		name     string
