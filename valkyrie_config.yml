@@ -2,17 +2,19 @@ logging:
   level: info
 providers:
   - name: Evolution
+    base_path: "/evolution"
     auth:
       casino_key: ${EVO_CASINO_KEY}
       api_key: ${EVO_API_TOKEN} # Token for incoming requests
       casino_token: ${EVO_CASINO_API_TOKEN} # Token for outgoing requests
     url: ${EVO_BASE_URL}
   - name: Red Tiger
+    base_path: "/rt"
     url: ${RT_BASE_URL}
     auth:
-      recon_token: ${RT_RECON_TOKEN}
-      api_key: RT_API_KEY
+      api_key: ${RT_API_KEY}
 pam:
+  name: generic # check /pam-folder for available PAMs
   url: ${PAM_URL}
   api_key: ${PAM_API_KEY}
 

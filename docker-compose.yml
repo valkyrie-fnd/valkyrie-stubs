@@ -1,0 +1,26 @@
+services:
+  stubs:
+    build:
+      context: .
+    ports:
+      - 8080:8080
+      - 3000:3000
+    depends_on:
+      - valkyrie
+
+  valkyrie:
+    image: valkyriefnd/valkyrie:latest
+    command: -config valkyrie_config.yml
+    ports:
+      - 8083:8083
+      - 8084:8084
+    environment:
+      EVO_API_TOKEN: evo-api-key
+      EVO_CASINO_API_TOKEN: EVO_CASINO_API_TOKEN
+      EVO_CASINO_KEY: EVO_CASINO_KEY
+      RT_API_KEY: RT_API_KEY
+      PAM_URL: http://stubs:8080
+      PAM_API_KEY: pam-api-token
+      VALK_PROFILES: local
+    volumes:
+      - ./valkyrie_config.yml:/app/valkyrie_config.yml

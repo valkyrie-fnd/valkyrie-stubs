@@ -8,5 +8,6 @@ RUN GOOS=linux go build -ldflags="-w -s" .
 
 FROM scratch
 WORKDIR /app
-COPY --from=builder /app/pam-stub /usr/bin/
-ENTRYPOINT ["pam-stub"]
+COPY --from=builder /app/datastore.config.yaml /app/
+COPY --from=builder /app/valkyrie-stubs /usr/bin/
+ENTRYPOINT ["valkyrie-stubs"]
