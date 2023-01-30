@@ -6,6 +6,7 @@ require (
 	github.com/four-fingers/oapi-codegen v0.0.0-20221219135408-9237c9743c67
 	github.com/gofiber/fiber/v2 v2.38.1
 	github.com/joho/godotenv v1.4.0
+	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.28.0
 	github.com/stretchr/testify v1.8.1
 	gopkg.in/yaml.v3 v3.0.1
