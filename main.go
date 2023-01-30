@@ -11,6 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/valkyrie-fnd/valkyrie-stubs/backdoors"
+	"github.com/valkyrie-fnd/valkyrie-stubs/broken"
 	"github.com/valkyrie-fnd/valkyrie-stubs/datastore"
 	"github.com/valkyrie-fnd/valkyrie-stubs/genericpam"
 	"github.com/valkyrie-fnd/valkyrie-stubs/memorydatastore"
@@ -55,6 +56,8 @@ func main() {
 				Level: "info",
 			},
 		})
+	case "broken":
+		broken.RunServer(addr, genericpam.Routes(eds, eds.GetPamApiToken(), eds.GetProviderTokens()))
 	default:
 		panic(errors.New("unknown operator"))
 	}
