@@ -24,6 +24,15 @@ func RunServer(ds datastore.DataStore, addr, pamApiKey string, providerTokens ma
 	return app
 }
 
+func Routes(
+	ds datastore.DataStore,
+	pamApiKey string,
+	providerTokens map[string]string) func(router fiber.Router) {
+	return func(router fiber.Router) {
+		SetUpRoutes(router, ds, pamApiKey, providerTokens)
+	}
+}
+
 func SetUpRoutes(router fiber.Router, ds datastore.DataStore, pamApiKey string, providerTokens map[string]string) {
 	controller := NewController(ds)
 	controller.registerMiddlewares(router, pamApiKey, providerTokens)
