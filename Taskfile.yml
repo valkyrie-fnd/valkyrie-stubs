@@ -248,7 +248,7 @@ tasks:
       - build
     cmds:
       - go install github.com/nikolaydubina/go-binsize-treemap@latest
-      - go tool nm -size ./build/valkyrie | go-binsize-treemap > ./build/binsize.svg
+      - go tool nm -size ./build/valkyrie-stubs | go-binsize-treemap > ./build/binsize.svg
       - open ./build/binsize.svg
 
   bench:
