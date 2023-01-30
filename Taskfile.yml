@@ -66,12 +66,12 @@ tasks:
       - sh: "command -v golangci-lint"
         msg: "Please install golangci-lint first: https://golangci-lint.run/usage/install/"
         
-  lint-yaml:
+  lint:yaml:
     desc: lint yaml files
     cmds:
       - docker run --rm -it -v $(pwd):/data cytopia/yamllint -f parsable $(git ls-files '*.yml' '*.yaml')
   
-  lint-docker:
+  lint:docker:
     desc: lint Dockerfile
     cmds:
       - docker run --rm -i hadolint/hadolint hadolint - < ./Dockerfile
@@ -118,7 +118,7 @@ tasks:
     cmds:
       - "{{.BUILD_CMD}} -o {{.BUILD_DIR}}/{{.NAME}}"
 
-  build-linux:
+  build:linux:
     desc: build linux binary
     deps:
       - pre-build
@@ -126,7 +126,7 @@ tasks:
       - mkdir -p {{.BUILD_DIR}}/linux-amd64
       - GOOS=linux GOARCH=amd64 {{.BUILD_CMD}} -o {{.BUILD_DIR}}/linux-amd64/{{.NAME}}
 
-  build-windows:
+  build:windows:
     desc: build windows binary
     deps:
       - pre-build
@@ -134,7 +134,7 @@ tasks:
       - mkdir -p {{.BUILD_DIR}}/windows-amd64
       - GOOS=windows GOARCH=amd64 {{.BUILD_CMD}} -o {{.BUILD_DIR}}/windows-amd64/{{.NAME}}.exe
         
-  build-osx:
+  build:osx:
     desc: build OSX binary
     deps:
       - pre-build
@@ -144,44 +144,13 @@ tasks:
       - mkdir -p {{.BUILD_DIR}}/darwin-arm64
       - GOOS=darwin GOARCH=arm64 {{.BUILD_CMD}} -o {{.BUILD_DIR}}/darwin-arm64/{{.NAME}}
 
-  build-all:
+  build:all:
     desc: build for all supported platforms
     deps:
-      - build-linux
-      - build-windows
-      - build-osx
+      - build:linux
+      - build:windows
+      - build:osx
 
-  package-linux:
-    desc: package linux binary
-    deps:
-      - build-linux
-    cmds:
-      - cp scripts/* {{.BUILD_DIR}}/linux-amd64
-      - cp configs/testdata/valkyrie_config.minimal.yml {{.BUILD_DIR}}/linux-amd64/config.yml
-      - tar -C {{.BUILD_DIR}}/linux-amd64 -zcf {{.BUILD_DIR}}/{{.NAME}}-{{.VERSION}}-linux-amd64.tar.gz {{.NAME}} svc.sh valkyrie.service.template config.yml
-
-  package-windows:
-    desc: package windows binary
-    deps:
-      - build-windows
-    cmds:
-      - zip {{.BUILD_DIR}}/{{.NAME}}-{{.VERSION}}-windows-amd64.zip {{.BUILD_DIR}}/windows-amd64/{{.NAME}}.exe
-
-  package-osx:
-    desc: package osx binary
-    deps:
-      - build-osx
-    cmds:
-      - tar -C {{.BUILD_DIR}}/darwin-amd64 -zcf {{.BUILD_DIR}}/{{.NAME}}-{{.VERSION}}-darwin-amd64.tar.gz {{.NAME}}
-      - tar -C {{.BUILD_DIR}}/darwin-arm64 -zcf {{.BUILD_DIR}}/{{.NAME}}-{{.VERSION}}-darwin-arm64.tar.gz {{.NAME}}
-
-  package-all:
-    desc: package all binaries
-    deps:
-      - package-linux
-      - package-windows
-      - package-osx
-  
   clean:
     desc: clean project
     vars:
@@ -190,7 +159,7 @@ tasks:
       - '{{.SHELL}} rm -r {{.FORCE}} {{.BUILD_DIR}}'
       - go clean
         
-  docker-build:
+  docker:build:
     desc: build a docker image
     vars:
       DOCKER_REPO: '{{ default "localhost:5000" .DOCKER_REPO }}'
@@ -198,7 +167,7 @@ tasks:
     cmds:
       - docker build --tag "{{.DOCKER_REPO}}/{{.NAME}}:{{.TAG}}" --build-arg GH_TOKEN={{.GH_TOKEN}} --build-arg VERSION={{.VERSION}} .
   
-  docker-push:
+  docker:push:
     desc: push docker image
     deps:
       - docker-build
@@ -238,7 +207,7 @@ tasks:
       - build
     cmds:
       - go install github.com/nikolaydubina/go-binsize-treemap@latest
-      - go tool nm -size ./build/valkyrie-stubs | go-binsize-treemap > ./build/binsize.svg
+      - go tool nm -size ./build/{{.NAME}} | go-binsize-treemap > ./build/binsize.svg
       - open ./build/binsize.svg
 
   bench:
