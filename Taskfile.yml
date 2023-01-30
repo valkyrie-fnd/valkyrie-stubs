@@ -181,11 +181,6 @@ tasks:
       - package-linux
       - package-windows
       - package-osx
-        
-  changelog:
-    desc: print latest changes in CHANGELOG.md
-    cmds:
-      - bash .github/tools/changelog.sh {{.VERSION}}
   
   clean:
     desc: clean project
@@ -194,11 +189,6 @@ tasks:
     cmds:
       - '{{.SHELL}} rm -r {{.FORCE}} {{.BUILD_DIR}}'
       - go clean
-        
-  release:
-    desc: create a release
-    cmds:
-      - '{{.SHELL}} cat .github/RELEASING.md' # print instructions, as releases are not automated
         
   docker-build:
     desc: build a docker image
