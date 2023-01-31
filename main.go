@@ -48,7 +48,14 @@ func main() {
 
 	switch pam {
 	case "genericpam":
-		genericpam.RunServer(eds, addr, eds.GetPamApiToken(), eds.GetProviderTokens())
+		genericpam.RunServer(eds, genericpam.Config{
+			PamApiKey:      eds.GetPamApiToken(),
+			ProviderTokens: eds.GetProviderTokens(),
+			Address:        addr,
+			LogConfig: genericpam.LogConfig{
+				Level: "info",
+			},
+		})
 	case "broken":
 		broken.RunServer(addr, genericpam.Routes(eds, eds.GetPamApiToken(), eds.GetProviderTokens()))
 	default:
