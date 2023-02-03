@@ -2,26 +2,20 @@ package genericpam
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/rs/zerolog/log"
 
 	"github.com/valkyrie-fnd/valkyrie-stubs/datastore"
+	"github.com/valkyrie-fnd/valkyrie-stubs/utils"
 )
 
 func RunServer(ds datastore.DataStore, config Config) *fiber.App {
-	app := fiber.New(fiber.Config{
+	app := utils.HangingStart(config.Address, fiber.Config{
 		DisableStartupMessage: true,
 		Immutable:             true, // since we store values in-memory after handlers have returned
+	}, func(app *fiber.App) {
+		ConfigureLogging(config.LogConfig)
+		SetUpRoutes(app, ds, config.PamApiKey, config.ProviderTokens)
+
 	})
-
-	ConfigureLogging(config.LogConfig)
-	SetUpRoutes(app, ds, config.PamApiKey, config.ProviderTokens)
-
-	go func() {
-		err := app.Listen(config.Address)
-		if err != nil {
-			log.Fatal().Err(err).Msg("Failed to start")
-		}
-	}()
 
 	return app
 }
