@@ -2,6 +2,8 @@
 package backdoors
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
 	"github.com/valkyrie-fnd/valkyrie-stubs/backdoors/evolution"
@@ -9,7 +11,9 @@ import (
 	"github.com/valkyrie-fnd/valkyrie-stubs/datastore"
 )
 
-func BackdoorServer(eds datastore.ExtendedDatastore, addr string) *fiber.App {
+// BackdoorServer creates a new fiber app with the backdoor endpoints. Returns the
+// app and the address it is listening on.
+func BackdoorServer(eds datastore.ExtendedDatastore, addr string) (*fiber.App, string) {
 	app := fiber.New(fiber.Config{
 		DisableStartupMessage: true,
 		Immutable:             true, // since we store values in-memory after handlers have returned
@@ -30,5 +34,5 @@ func BackdoorServer(eds datastore.ExtendedDatastore, addr string) *fiber.App {
 		}
 	}()
 
-	return app
+	return app, fmt.Sprintf("http://%s/backdoors/", addr)
 }
