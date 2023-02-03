@@ -6,6 +6,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/valkyrie-fnd/valkyrie-stubs/genericpam"
+	"github.com/valkyrie-fnd/valkyrie-stubs/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html"
@@ -25,42 +26,38 @@ func RunServer(addr string, regularRoutes func(fiber.Router)) *fiber.App {
 	// Initialize standard Go html template engine
 	engine := html.New("./broken/views", ".html")
 
-	app := fiber.New(fiber.Config{
+	app := utils.HangingStart(addr, fiber.Config{
 		DisableStartupMessage: true,
 		Immutable:             true, // since we store values in-memory after handlers have returned
 		Views:                 engine,
-	})
+	},
+		func(app *fiber.App) {
 
-	pamErrors := make(chan genericpam.PamError)
-	breakingErrors := make(chan string)
-	app.Hooks().OnShutdown(func() error {
-		close(pamErrors)
-		close(breakingErrors)
-		return nil
-	})
+			pamErrors := make(chan genericpam.PamError)
+			breakingErrors := make(chan string)
+			app.Hooks().OnShutdown(func() error {
+				close(pamErrors)
+				close(breakingErrors)
+				return nil
+			})
 
-	app.Group("/broken").Get("/", func(c *fiber.Ctx) error {
-		return c.Render("list", fiber.Map{
-			"softErrors": softErrors,
-			"hardErrors": hardErrors,
-		})
-	}).
-		Get("error", softErrorRoute(pamErrors)).
-		Get("hard", hardErrorRoute(breakingErrors))
+			app.Group("/broken").Get("/", func(c *fiber.Ctx) error {
+				return c.Render("list", fiber.Map{
+					"softErrors": softErrors,
+					"hardErrors": hardErrors,
+				})
+			}).
+				Get("error", softErrorRoute(pamErrors)).
+				Get("hard", hardErrorRoute(breakingErrors))
 
-	// Setup middleware which injects errors
-	app.Use(injectPAMError(pamErrors))
-	app.Use(injectBreakage(breakingErrors))
+			// Setup middleware which injects errors
+			app.Use(injectPAMError(pamErrors))
+			app.Use(injectBreakage(breakingErrors))
 
-	// Add regular routes
-	regularRoutes(app)
-
-	go func() {
-		err := app.Listen(addr)
-		if err != nil {
-			log.Fatal().Err(err).Msg("Failed to start")
-		}
-	}()
+			// Add regular routes
+			regularRoutes(app)
+		},
+	)
 
 	return app
 }
