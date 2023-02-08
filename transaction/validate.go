@@ -246,7 +246,7 @@ func (ts *TransactionService) getPreviousTransaction(trans *datastore.Transactio
 		if matchType {
 			for _, tx := range trx {
 				if tx.TransactionType == trans.TransactionType {
-					twinTrans = &tx
+					twinTrans = utils.Ptr(tx)
 					break
 				}
 			}

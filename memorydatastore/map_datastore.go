@@ -168,7 +168,7 @@ func (ds *MapDataStore) configure(config *Config) {
 		ds.AddSession(s)
 	}
 	for _, t := range config.Transactions {
-		_ = ds.AddTransaction(context.Background(), &t)
+		_ = ds.AddTransaction(context.Background(), utils.Ptr(t))
 	}
 }
 
