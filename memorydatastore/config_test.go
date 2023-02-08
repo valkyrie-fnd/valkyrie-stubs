@@ -2,11 +2,11 @@ package memorydatastore
 
 import (
 	"os"
-	"reflect"
 	"testing"
 	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/stretchr/testify/assert"
 	"github.com/valkyrie-fnd/valkyrie-stubs/datastore"
 	"github.com/valkyrie-fnd/valkyrie-stubs/utils"
 )
@@ -111,7 +111,7 @@ func TestReadConfig(t *testing.T) {
 		name    string
 		args    args
 		want    *Config
-		wantErr bool
+		wantErr assert.ErrorAssertionFunc
 	}{
 		{
 			name: "read plain yaml from config.test.yaml",
@@ -119,7 +119,7 @@ func TestReadConfig(t *testing.T) {
 				file: "testdata/config.test.yaml",
 			},
 			want:    expectedConfig,
-			wantErr: false,
+			wantErr: assert.NoError,
 		},
 		{
 			name: "read yaml with anchors from anchors.test.yaml",
@@ -127,7 +127,7 @@ func TestReadConfig(t *testing.T) {
 				file: "testdata/anchors.test.yaml",
 			},
 			want:    expectedConfig,
-			wantErr: false,
+			wantErr: assert.NoError,
 		},
 		{
 			name: "read missing file missing.test.yaml fails",
@@ -135,7 +135,7 @@ func TestReadConfig(t *testing.T) {
 				file: "testdata/missing.test.yaml",
 			},
 			want:    nil,
-			wantErr: true,
+			wantErr: assert.Error,
 		},
 		{
 			name: "read yaml with environment substitution env.test.yaml",
@@ -143,20 +143,15 @@ func TestReadConfig(t *testing.T) {
 				file: "testdata/env.test.yaml",
 			},
 			want:    &Config{PamAPIToken: "test"},
-			wantErr: false,
+			wantErr: assert.NoError,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			runWithEnvAndReset("testdata/.env.testing", func() {
 				got, err := ReadConfig(tt.args.file)
-				if (err != nil) != tt.wantErr {
-					t.Errorf("parse() error = %v, wantErr %v", err, tt.wantErr)
-					return
-				}
-				if !reflect.DeepEqual(got, tt.want) {
-					t.Errorf("parse() got = %v, want %v", got, tt.want)
-				}
+				tt.wantErr(t, err)
+				assert.Equal(t, tt.want, got)
 			})
 		})
 	}

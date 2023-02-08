@@ -22,7 +22,7 @@ type Config struct {
 }
 
 func ReadConfig(file string) (*Config, error) {
-	data, err := os.ReadFile(file)
+	data, err := os.ReadFile(file) //nolint:gosec //we do need to read the file
 	if err != nil {
 		return nil, err
 	}
