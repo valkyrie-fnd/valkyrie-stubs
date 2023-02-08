@@ -13,17 +13,17 @@ import (
 
 var expectedTime, _ = time.Parse(time.RFC3339, "2006-01-02T15:04:05Z")
 var expectedConfig = &Config{
-	PamApiToken: "pam-api-token",
+	PamAPIToken: "pam-api-token",
 	Providers: []datastore.Provider{
 		{
 			Provider:   "Evolution",
-			ProviderId: 3,
+			ProviderID: 3,
 		},
 	},
-	ProviderApiKeys: []datastore.ProviderApiKey{
+	ProviderAPIKeys: []datastore.ProviderAPIKey{
 		{
 			Provider: "Evolution",
-			ApiKey:   "evo-api-key",
+			APIKey:   "evo-api-key",
 		},
 	},
 	ProviderSessions: []datastore.Session{
@@ -34,21 +34,21 @@ var expectedConfig = &Config{
 	},
 	Games: []datastore.Game{
 		{
-			ProviderGameId: "vctlz20yfnmp1ylr",
+			ProviderGameID: "vctlz20yfnmp1ylr",
 		},
 	},
 	GameRounds: []datastore.GameRound{
 		{
-			ProviderGameId:  "vctlz20yfnmp1ylr",
-			ProviderRoundId: "vVJBwYIUc5",
+			ProviderGameID:  "vctlz20yfnmp1ylr",
+			ProviderRoundID: "vVJBwYIUc5",
 			StartTime:       expectedTime,
 			ProviderName:    "Evolution",
-			PlayerId:        "2000001",
+			PlayerID:        "2000001",
 		},
 	},
 	Accounts: []datastore.Account{
 		{
-			Id:               3,
+			ID:               3,
 			PlayerIdentifier: "2000001",
 			Currency:         "SEK",
 			Country:          "SE",
@@ -58,7 +58,7 @@ var expectedConfig = &Config{
 			PromoAmount:      1,
 		},
 		{
-			Id:               10,
+			ID:               10,
 			PlayerIdentifier: "5000001",
 			Currency:         "EUR",
 			Country:          "SE",
@@ -70,11 +70,11 @@ var expectedConfig = &Config{
 	},
 	Players: []datastore.Player{
 		{
-			Id:               2000001,
+			ID:               2000001,
 			PlayerIdentifier: "2000001",
 		},
 		{
-			Id:               5000001,
+			ID:               5000001,
 			PlayerIdentifier: "5000001",
 		},
 	},
@@ -93,11 +93,11 @@ var expectedConfig = &Config{
 			PromoAmount:           1,
 			Currency:              "SEK",
 			TransactionType:       "DEPOSIT",
-			ProviderTransactionId: "123",
+			ProviderTransactionID: "123",
 			ProviderBetRef:        utils.Ptr("321"),
-			ProviderGameId:        "vctlz20yfnmp1ylr",
+			ProviderGameID:        "vctlz20yfnmp1ylr",
 			ProviderName:          "Evolution",
-			ProviderRoundId:       utils.Ptr("vVJBwYIUc5"),
+			ProviderRoundID:       utils.Ptr("vVJBwYIUc5"),
 			TransactionDateTime:   expectedTime,
 		},
 	},
@@ -142,7 +142,7 @@ func TestReadConfig(t *testing.T) {
 			args: args{
 				file: "testdata/env.test.yaml",
 			},
-			want:    &Config{PamApiToken: "test"},
+			want:    &Config{PamAPIToken: "test"},
 			wantErr: false,
 		},
 	}

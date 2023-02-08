@@ -13,7 +13,7 @@ func RunServer(ds datastore.DataStore, config Config) *fiber.App {
 		Immutable:             true, // since we store values in-memory after handlers have returned
 	}, func(app *fiber.App) {
 		ConfigureLogging(config.LogConfig)
-		SetUpRoutes(app, ds, config.PamApiKey, config.ProviderTokens)
+		SetUpRoutes(app, ds, config.PamAPIKey, config.ProviderTokens)
 
 	})
 
@@ -22,16 +22,16 @@ func RunServer(ds datastore.DataStore, config Config) *fiber.App {
 
 func Routes(
 	ds datastore.DataStore,
-	pamApiKey string,
+	pamAPIKey string,
 	providerTokens map[string]string) func(router fiber.Router) {
 	return func(router fiber.Router) {
-		SetUpRoutes(router, ds, pamApiKey, providerTokens)
+		SetUpRoutes(router, ds, pamAPIKey, providerTokens)
 	}
 }
 
-func SetUpRoutes(router fiber.Router, ds datastore.DataStore, pamApiKey string, providerTokens map[string]string) {
+func SetUpRoutes(router fiber.Router, ds datastore.DataStore, pamAPIKey string, providerTokens map[string]string) {
 	controller := NewController(ds)
-	controller.registerMiddlewares(router, pamApiKey, providerTokens)
+	controller.registerMiddlewares(router, pamAPIKey, providerTokens)
 
 	RegisterHandlers(router, NewStrictHandler(controller, nil))
 }

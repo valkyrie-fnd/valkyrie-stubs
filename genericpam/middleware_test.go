@@ -88,7 +88,7 @@ func Test_CheckPamApiToken(t *testing.T) {
 
 	ds := memorydatastore.NewMapDataStore(&memorydatastore.Config{})
 	app := fiber.New()
-	app.Use(Controller{ds}.getCheckPamApiToken("pam_token")).
+	app.Use(Controller{ds}.getCheckPamAPIToken("pam_token")).
 		All("", func(ctx *fiber.Ctx) error {
 			return ctx.SendStatus(http.StatusOK)
 		})
@@ -105,10 +105,10 @@ func Test_CheckPamApiToken(t *testing.T) {
 	}
 }
 
-func Test_checkPlayerId(t *testing.T) {
+func Test_checkPlayerID(t *testing.T) {
 	tests := []struct {
 		name      string
-		playerId  string
+		playerID  string
 		errorCode ErrorCode
 	}{
 		{
@@ -126,20 +126,20 @@ func Test_checkPlayerId(t *testing.T) {
 	ds := memorydatastore.NewMapDataStore(&memorydatastore.Config{
 		Players: []datastore.Player{
 			{
-				Id:               1,
+				ID:               1,
 				PlayerIdentifier: "id",
 			},
 		},
 	})
 	app := fiber.New()
-	app.Use("/players/:playerId/+", Controller{ds}.checkPlayerId).
+	app.Use("/players/:playerId/+", Controller{ds}.checkPlayerID).
 		All("/players/:playerId/+", func(ctx *fiber.Ctx) error {
 			return ctx.SendStatus(http.StatusOK)
 		})
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/players/%s/foo", test.playerId), nil)
+			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/players/%s/foo", test.playerID), nil)
 			resp, err := app.Test(req)
 
 			assert.NoError(t, err)
@@ -169,7 +169,7 @@ func Test_checkProvider(t *testing.T) {
 	}
 
 	ds := memorydatastore.NewMapDataStore(&memorydatastore.Config{Providers: []datastore.Provider{{
-		ProviderId: 0,
+		ProviderID: 0,
 		Provider:   "provider",
 	}}})
 	app := fiber.New()

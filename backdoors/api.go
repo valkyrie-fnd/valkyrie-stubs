@@ -12,24 +12,24 @@ import (
 )
 
 type SessionRequest struct {
-	UserId      *string  `json:"userId,omitempty"`
-	Currency    *string  `json:"currency,omitempty"`
+	IsBlocked   *bool    `json:"isBlocked,omitempty"`
 	CashAmount  *float64 `json:"cashAmount,omitempty"`
 	BonusAmount *float64 `json:"bonusAmount,omitempty"`
 	PromoAmount *float64 `json:"promoAmount,omitempty"`
-	IsBlocked   *bool    `json:"isBlocked,omitempty"`
+	UserID      *string  `json:"userId,omitempty"`
+	GameID      *string  `json:"gameId"`
+	Currency    *string  `json:"currency,omitempty"`
 	Provider    string   `json:"provider"`
-	GameId      *string  `json:"gameId"`
 }
 
 type SessionResponse struct {
-	Success bool   `json:"success"`
 	Result  Result `json:"result"`
+	Success bool   `json:"success"`
 }
 
 type Result struct {
 	Token  string `json:"token"`
-	UserId string `json:"userId"`
+	UserID string `json:"userId"`
 }
 
 var Session = func(ds datastore.ExtendedDatastore) fiber.Handler {
@@ -39,28 +39,28 @@ var Session = func(ds datastore.ExtendedDatastore) fiber.Handler {
 			return err
 		}
 
-		if req.UserId == nil {
-			req.UserId = utils.Ptr(utils.RandomString(10)) // default generate userid
+		if req.UserID == nil {
+			req.UserID = utils.Ptr(utils.RandomString(10)) // default generate userID
 		}
 		if req.Currency == nil {
 			req.Currency = utils.Ptr("EUR") // default currency
 		}
-		if req.GameId == nil {
-			req.GameId = utils.Ptr(utils.RandomString(10)) // default just generate gameid
+		if req.GameID == nil {
+			req.GameID = utils.Ptr(utils.RandomString(10)) // default just generate gameID
 		}
 
-		_, err := ds.GetPlayer(c.UserContext(), *req.UserId)
+		_, err := ds.GetPlayer(c.UserContext(), *req.UserID)
 		if err != nil {
-			ds.AddPlayer(datastore.Player{Id: utils.RandomInt(), PlayerIdentifier: *req.UserId})
+			ds.AddPlayer(datastore.Player{ID: utils.RandomInt(), PlayerIdentifier: *req.UserID})
 		}
 		acc := upsertAccount(c.UserContext(), ds, req)
-		token := createSession(ds, req.Provider, *req.GameId, acc)
+		token := createSession(ds, req.Provider, *req.GameID, acc)
 
 		return c.Status(http.StatusOK).JSON(SessionResponse{
 			Success: true,
 			Result: Result{
 				Token:  token,
-				UserId: *req.UserId,
+				UserID: *req.UserID,
 			},
 		})
 	}
@@ -68,11 +68,11 @@ var Session = func(ds datastore.ExtendedDatastore) fiber.Handler {
 
 // upsertAccount creates or updates account
 func upsertAccount(ctx context.Context, ds datastore.ExtendedDatastore, req SessionRequest) datastore.Account {
-	currAccount, err := ds.GetAccount(ctx, *req.UserId, *req.Currency)
+	account, err := ds.GetAccount(ctx, *req.UserID, *req.Currency)
 	if err != nil {
 		newAccount := datastore.Account{
-			Id:               utils.RandomInt(),
-			PlayerIdentifier: *req.UserId,
+			ID:               utils.RandomInt(),
+			PlayerIdentifier: *req.UserID,
 			Currency:         *req.Currency,
 			CashAmount:       utils.OrDefault(req.CashAmount, 1000.0),
 			BonusAmount:      utils.OrDefault(req.BonusAmount, 0.0),
@@ -82,17 +82,17 @@ func upsertAccount(ctx context.Context, ds datastore.ExtendedDatastore, req Sess
 		ds.AddAccount(newAccount)
 		return newAccount
 	} else {
-		currAccount.CashAmount = utils.OrDefault(req.CashAmount, currAccount.CashAmount)
-		currAccount.BonusAmount = utils.OrDefault(req.BonusAmount, currAccount.BonusAmount)
-		currAccount.PromoAmount = utils.OrDefault(req.PromoAmount, currAccount.PromoAmount)
-		currAccount.IsBlocked = utils.OrDefault(req.IsBlocked, currAccount.IsBlocked)
+		account.CashAmount = utils.OrDefault(req.CashAmount, account.CashAmount)
+		account.BonusAmount = utils.OrDefault(req.BonusAmount, account.BonusAmount)
+		account.PromoAmount = utils.OrDefault(req.PromoAmount, account.PromoAmount)
+		account.IsBlocked = utils.OrDefault(req.IsBlocked, account.IsBlocked)
 
-		_ = ds.UpdateAccount(currAccount.PlayerIdentifier, *currAccount)
-		return *currAccount
+		_ = ds.UpdateAccount(account.PlayerIdentifier, *account)
+		return *account
 	}
 }
 
-func createSession(ds datastore.ExtendedDatastore, provider, gameId string, acc datastore.Account) string {
+func createSession(ds datastore.ExtendedDatastore, provider, gameID string, acc datastore.Account) string {
 	sessionToken := utils.RandomString(32)
 	ds.AddSession(datastore.Session{
 		Key:              sessionToken,
@@ -103,7 +103,7 @@ func createSession(ds datastore.ExtendedDatastore, provider, gameId string, acc 
 		Language:         acc.Language,
 		Timestamp:        time.Now(),
 		Timeout:          ds.GetSessionTimeout(),
-		GameId:           utils.Ptr(gameId),
+		GameID:           utils.Ptr(gameID),
 	})
 	return sessionToken
 }

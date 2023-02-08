@@ -11,7 +11,7 @@ import (
 )
 
 type Config struct {
-	PamApiKey      string            // pam api key
+	PamAPIKey      string            // pam API key
 	ProviderTokens map[string]string // provider specific tokens used for reconciliation
 	Address        string            // address to bind to, for example "localhost:8080"
 	LogConfig      LogConfig         // logging configuration

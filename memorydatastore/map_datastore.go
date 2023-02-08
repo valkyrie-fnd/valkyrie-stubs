@@ -12,28 +12,28 @@ import (
 )
 
 type gameRounds struct {
-	Mux sync.RWMutex
 	Map map[string]*datastore.GameRound
+	Mux sync.RWMutex
 }
 
 type sessions struct {
-	Mux sync.RWMutex
 	Map map[string]*datastore.Session
+	Mux sync.RWMutex
 }
 
 type games struct {
-	Mux sync.RWMutex
 	Map map[string]*datastore.Game
+	Mux sync.RWMutex
 }
 
 type providers struct {
-	Mux sync.RWMutex
 	Map map[string]*datastore.Provider
+	Mux sync.RWMutex
 }
 
-type providerApiKeys struct {
+type providerAPIKeys struct {
+	Map map[string]*datastore.ProviderAPIKey
 	Mux sync.RWMutex
-	Map map[string]*datastore.ProviderApiKey
 }
 
 type accountKey struct {
@@ -42,21 +42,22 @@ type accountKey struct {
 }
 
 type accounts struct {
-	Mux sync.RWMutex
 	Map map[accountKey]*datastore.Account
+	Mux sync.RWMutex
 }
 
 type players struct {
-	Mux sync.RWMutex
 	Map map[string]*datastore.Player
+	Mux sync.RWMutex
 }
 
 type transactions struct {
-	Mux sync.RWMutex
 	Map map[int]*datastore.Transaction
+	Mux sync.RWMutex
 }
 
 type mapStorage struct {
+	SessionTimeout   *int
 	Players          *players
 	Sessions         *sessions
 	Accounts         *accounts
@@ -64,10 +65,9 @@ type mapStorage struct {
 	Games            *games
 	GameRounds       *gameRounds
 	Providers        *providers
-	ProviderApiKeys  *providerApiKeys
+	ProviderAPIKeys  *providerAPIKeys
 	ProviderSessions *sessions
-	PamApiToken      string
-	SessionTimeout   *int
+	PamAPIToken      string
 }
 type MapDataStore struct {
 	mapStorage
@@ -96,8 +96,8 @@ func NewMapDataStore(config *Config) *MapDataStore {
 		Providers: &providers{
 			Map: map[string]*datastore.Provider{},
 		},
-		ProviderApiKeys: &providerApiKeys{
-			Map: map[string]*datastore.ProviderApiKey{},
+		ProviderAPIKeys: &providerAPIKeys{
+			Map: map[string]*datastore.ProviderAPIKey{},
 		},
 		ProviderSessions: &sessions{
 			Map: map[string]*datastore.Session{},
@@ -110,8 +110,8 @@ func NewMapDataStore(config *Config) *MapDataStore {
 
 	return dataStore
 }
-func (ds *MapDataStore) AddPamApiToken(t string) {
-	ds.PamApiToken = t
+func (ds *MapDataStore) AddPamAPIToken(t string) {
+	ds.PamAPIToken = t
 }
 
 func (ds *MapDataStore) GetSessionTimeout() int {
@@ -127,27 +127,27 @@ func (ds *MapDataStore) addProvider(p datastore.Provider) {
 	ds.Providers.Map[p.Provider] = &p
 }
 
-func (ds *MapDataStore) addProviderApiKey(p datastore.ProviderApiKey) {
-	ds.ProviderApiKeys.Mux.Lock()
-	defer ds.ProviderApiKeys.Mux.Unlock()
+func (ds *MapDataStore) addProviderAPIKey(p datastore.ProviderAPIKey) {
+	ds.ProviderAPIKeys.Mux.Lock()
+	defer ds.ProviderAPIKeys.Mux.Unlock()
 
-	ds.ProviderApiKeys.Map[p.Provider] = &p
+	ds.ProviderAPIKeys.Map[p.Provider] = &p
 }
 
 func (ds *MapDataStore) addGame(g datastore.Game) {
 	ds.Games.Mux.Lock()
 	defer ds.Games.Mux.Unlock()
 
-	ds.Games.Map[g.ProviderGameId] = &g
+	ds.Games.Map[g.ProviderGameID] = &g
 }
 
 func (ds *MapDataStore) configure(config *Config) {
-	ds.AddPamApiToken(config.PamApiToken)
+	ds.AddPamAPIToken(config.PamAPIToken)
 	for _, p := range config.Providers {
 		ds.addProvider(p)
 	}
-	for _, p := range config.ProviderApiKeys {
-		ds.addProviderApiKey(p)
+	for _, p := range config.ProviderAPIKeys {
+		ds.addProviderAPIKey(p)
 	}
 	for _, s := range config.ProviderSessions {
 		ds.AddProviderSession(s)
@@ -206,11 +206,11 @@ func (ds *MapDataStore) TouchSession(_ context.Context, sessionKey string) error
 	}
 }
 
-func (ds *MapDataStore) UpdateSession(_ context.Context, currKey, newKey string) (*datastore.Session, error) {
+func (ds *MapDataStore) UpdateSession(_ context.Context, currentKey, newKey string) (*datastore.Session, error) {
 	ds.Sessions.Mux.Lock()
 	defer ds.Sessions.Mux.Unlock()
 
-	if s, found := ds.Sessions.Map[currKey]; found {
+	if s, found := ds.Sessions.Map[currentKey]; found {
 		newSession := &datastore.Session{
 			Key:              newKey,
 			PlayerIdentifier: s.PlayerIdentifier,
@@ -220,7 +220,7 @@ func (ds *MapDataStore) UpdateSession(_ context.Context, currKey, newKey string)
 			Language:         s.Language,
 			Timestamp:        time.Now(),
 			Timeout:          s.Timeout,
-			GameId:           s.GameId,
+			GameID:           s.GameID,
 		}
 		s.Timeout = 0
 		ds.Sessions.Map[newKey] = newSession
@@ -232,14 +232,14 @@ func (ds *MapDataStore) UpdateSession(_ context.Context, currKey, newKey string)
 }
 
 func (ds *MapDataStore) AddTransaction(_ context.Context, t *datastore.Transaction) error {
-	if t.Id == 0 {
-		t.Id = utils.RandomInt()
+	if t.ID == 0 {
+		t.ID = utils.RandomInt()
 	}
 
 	ds.Transactions.Mux.Lock()
 	defer ds.Transactions.Mux.Unlock()
 
-	ds.Transactions.Map[t.Id] = t
+	ds.Transactions.Map[t.ID] = t
 	return nil
 }
 
@@ -247,15 +247,15 @@ func (ds *MapDataStore) AddGameRound(_ context.Context, gr datastore.GameRound) 
 	ds.GameRounds.Mux.Lock()
 	defer ds.GameRounds.Mux.Unlock()
 
-	ds.GameRounds.Map[gr.ProviderRoundId] = &gr
+	ds.GameRounds.Map[gr.ProviderRoundID] = &gr
 	return nil
 }
 
-func (ds *MapDataStore) GetGame(_ context.Context, gameId, providerName string) (*datastore.Game, error) {
+func (ds *MapDataStore) GetGame(_ context.Context, gameID, providerName string) (*datastore.Game, error) {
 	ds.Games.Mux.RLock()
 	defer ds.Games.Mux.RUnlock()
 
-	if v, found := ds.Games.Map[gameId]; found {
+	if v, found := ds.Games.Map[gameID]; found {
 		return v, nil
 	} else {
 		return nil, datastore.EntryNotFoundError
@@ -328,12 +328,12 @@ func (ds *MapDataStore) UpdateAccountBalance(_ context.Context, player, currency
 	}
 }
 
-func (ds *MapDataStore) UpdateAccount(playerId string, acc datastore.Account) error {
+func (ds *MapDataStore) UpdateAccount(playerID string, acc datastore.Account) error {
 	ds.Accounts.Mux.Lock()
 	defer ds.Accounts.Mux.Unlock()
 
 	accKey := accountKey{
-		Player:   playerId,
+		Player:   playerID,
 		Currency: acc.Currency,
 	}
 
@@ -356,7 +356,7 @@ func (ds *MapDataStore) EndGameRound(_ context.Context, gr datastore.GameRound) 
 	ds.GameRounds.Mux.Lock()
 	defer ds.GameRounds.Mux.Unlock()
 
-	if v, found := ds.GameRounds.Map[gr.ProviderRoundId]; found {
+	if v, found := ds.GameRounds.Map[gr.ProviderRoundID]; found {
 		t := time.Now()
 		v.EndTime = &t
 	} else {
@@ -376,25 +376,25 @@ func (ds *MapDataStore) GetSession(_ context.Context, key string) (*datastore.Se
 	}
 }
 
-func (ds *MapDataStore) GetProviderApiKey(provider string) (datastore.ProviderApiKey, error) {
-	ds.ProviderApiKeys.Mux.RLock()
-	defer ds.ProviderApiKeys.Mux.RUnlock()
+func (ds *MapDataStore) GetProviderAPIKey(provider string) (datastore.ProviderAPIKey, error) {
+	ds.ProviderAPIKeys.Mux.RLock()
+	defer ds.ProviderAPIKeys.Mux.RUnlock()
 
-	if v, found := ds.ProviderApiKeys.Map[provider]; found {
+	if v, found := ds.ProviderAPIKeys.Map[provider]; found {
 		return *v, nil
 	} else {
-		return datastore.ProviderApiKey{}, datastore.EntryNotFoundError
+		return datastore.ProviderAPIKey{}, datastore.EntryNotFoundError
 	}
 }
 
 // Note that transaction not found is not regarded as an error
-func (ds *MapDataStore) GetTransactionsById(_ context.Context, providerTransactionId, providerName string) ([]datastore.Transaction, error) {
+func (ds *MapDataStore) GetTransactionsByID(_ context.Context, providerTransactionID, providerName string) ([]datastore.Transaction, error) {
 	ds.Transactions.Mux.RLock()
 	defer ds.Transactions.Mux.RUnlock()
 	var trx []datastore.Transaction
 
 	for _, t := range ds.Transactions.Map {
-		if t.ProviderTransactionId == providerTransactionId {
+		if t.ProviderTransactionID == providerTransactionID {
 			trx = append(trx, *t)
 		}
 	}
@@ -415,24 +415,24 @@ func (ds *MapDataStore) GetTransactionsByRef(_ context.Context, providerBetRef, 
 	return trx, nil
 }
 
-func (ds *MapDataStore) GetTransactionsByRoundId(_ context.Context, providerRoundId string) ([]datastore.Transaction, error) {
+func (ds *MapDataStore) GetTransactionsByRoundID(_ context.Context, providerRoundID string) ([]datastore.Transaction, error) {
 	ds.Transactions.Mux.RLock()
 	defer ds.Transactions.Mux.RUnlock()
 
 	var trx []datastore.Transaction
 	for _, t := range ds.Transactions.Map {
-		if t.ProviderRoundId != nil && *t.ProviderRoundId == providerRoundId {
+		if t.ProviderRoundID != nil && *t.ProviderRoundID == providerRoundID {
 			trx = append(trx, *t)
 		}
 	}
 	return trx, nil
 }
 
-func (ds *MapDataStore) GetGameRound(_ context.Context, playerId, roundId string) (*datastore.GameRound, error) {
+func (ds *MapDataStore) GetGameRound(_ context.Context, _, roundID string) (*datastore.GameRound, error) {
 	ds.GameRounds.Mux.RLock()
 	defer ds.GameRounds.Mux.RUnlock()
 
-	if v, found := ds.GameRounds.Map[roundId]; found {
+	if v, found := ds.GameRounds.Map[roundID]; found {
 		return v, nil
 	} else {
 		return nil, datastore.EntryNotFoundError
@@ -451,8 +451,8 @@ func (ds *MapDataStore) GetProvider(_ context.Context, provider string) (*datast
 	}
 }
 
-func (ds *MapDataStore) GetPamApiToken() string {
-	return ds.PamApiToken
+func (ds *MapDataStore) GetPamAPIToken() string {
+	return ds.PamAPIToken
 }
 
 func (ds *MapDataStore) ClearSessionData() {

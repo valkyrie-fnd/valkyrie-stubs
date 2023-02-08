@@ -19,11 +19,11 @@ func NewHPMapDataStore(config *Config) *HPMapDataStore {
 
 func (ds *HPMapDataStore) AddTransaction(_ context.Context, t *datastore.Transaction) error {
 	// Hard coded id will keep the tx map very slim
-	t.Id = 123
+	t.ID = 123
 
 	ds.Transactions.Mux.Lock()
 	defer ds.Transactions.Mux.Unlock()
 
-	ds.Transactions.Map[t.Id] = t
+	ds.Transactions.Map[t.ID] = t
 	return nil
 }

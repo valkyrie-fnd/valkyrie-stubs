@@ -49,7 +49,7 @@ func main() {
 	switch pam {
 	case "genericpam":
 		genericpam.RunServer(eds, genericpam.Config{
-			PamApiKey:      eds.GetPamApiToken(),
+			PamAPIKey:      eds.GetPamAPIToken(),
 			ProviderTokens: eds.GetProviderTokens(),
 			Address:        addr,
 			LogConfig: genericpam.LogConfig{
@@ -57,7 +57,7 @@ func main() {
 			},
 		})
 	case "broken":
-		broken.RunServer(addr, genericpam.Routes(eds, eds.GetPamApiToken(), eds.GetProviderTokens()))
+		broken.RunServer(addr, genericpam.Routes(eds, eds.GetPamAPIToken(), eds.GetProviderTokens()))
 	default:
 		panic(errors.New("unknown operator"))
 	}

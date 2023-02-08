@@ -15,7 +15,7 @@ import (
 )
 
 type sidRequest struct {
-	Sid     string `json:"sid"`
+	SID     string `json:"sid"`
 	UserID  string `json:"userId" binding:"required"`
 	UUID    string `json:"uuid"`
 	Channel struct {
@@ -25,19 +25,19 @@ type sidRequest struct {
 
 type sidResponse struct {
 	Status string `json:"status"`
-	Sid    string `json:"sid,omitempty"`
+	SID    string `json:"sid,omitempty"`
 	UUID   string `json:"uuid,omitempty"`
 }
 
-var Sid = func(eds datastore.ExtendedDatastore) fiber.Handler {
+var SID = func(eds datastore.ExtendedDatastore) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Get expected Evolution API Key
-		res, err := eds.GetProviderApiKey("Evolution")
+		res, err := eds.GetProviderAPIKey("Evolution")
 		if err != nil {
 			log.Fatalf("evolution api key not configured in datastore: %v", err)
 		}
 		// Verify the API Key
-		if token := c.Query("authToken"); token == "" || token != res.ApiKey {
+		if token := c.Query("authToken"); token == "" || token != res.APIKey {
 			return c.Status(http.StatusUnauthorized).JSON(sidResponse{
 				Status: "UNKNOWN_ERROR",
 			})
@@ -54,24 +54,24 @@ var Sid = func(eds datastore.ExtendedDatastore) fiber.Handler {
 		sid := createPlayerAndSession(c.UserContext(), eds, req.UserID)
 
 		return c.Status(http.StatusOK).JSON(sidResponse{
-			Sid:    sid,
+			SID:    sid,
 			Status: "OK",
 			UUID:   req.UUID,
 		})
 	}
 }
 
-func createPlayerAndSession(ctx context.Context, eds datastore.ExtendedDatastore, playerId string) string {
+func createPlayerAndSession(ctx context.Context, eds datastore.ExtendedDatastore, playerID string) string {
 	sessionToken := rndStr()
-	pla, err := eds.GetPlayer(ctx, playerId)
+	pla, err := eds.GetPlayer(ctx, playerID)
 	if err != nil {
-		eds.AddPlayer(datastore.Player{Id: rndInt(), PlayerIdentifier: playerId})
-		pla, _ = eds.GetPlayer(ctx, playerId)
+		eds.AddPlayer(datastore.Player{ID: rndInt(), PlayerIdentifier: playerID})
+		pla, _ = eds.GetPlayer(ctx, playerID)
 	}
-	acc, err := eds.GetAccount(ctx, playerId, "EUR")
+	acc, err := eds.GetAccount(ctx, playerID, "EUR")
 	if err != nil {
-		eds.AddAccount(datastore.Account{Id: rndInt(), PlayerIdentifier: playerId, Currency: "EUR", CashAmount: 1000})
-		acc, _ = eds.GetAccount(ctx, playerId, "EUR")
+		eds.AddAccount(datastore.Account{ID: rndInt(), PlayerIdentifier: playerID, Currency: "EUR", CashAmount: 1000})
+		acc, _ = eds.GetAccount(ctx, playerID, "EUR")
 	}
 	eds.AddSession(datastore.Session{
 		Key:              sessionToken,

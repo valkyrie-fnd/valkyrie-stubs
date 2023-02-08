@@ -19,7 +19,7 @@ func BackdoorServer(eds datastore.ExtendedDatastore, addr string) (*fiber.App, s
 		Immutable:             true, // since we store values in-memory after handlers have returned
 	},
 		func(app *fiber.App) {
-			app.Post("/backdoors/evolution/sid", evolution.Sid(eds))
+			app.Post("/backdoors/evolution/sid", evolution.SID(eds))
 			app.Post("/backdoors/redtiger/session", redtiger.Session(eds))
 			app.Post("/backdoors/datastore/session/reset", func(ctx *fiber.Ctx) error {
 				eds.ClearSessionData()

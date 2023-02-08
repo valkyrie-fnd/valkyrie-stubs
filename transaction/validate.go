@@ -145,7 +145,7 @@ func (ts *TransactionService) cancellation(cancelTrans *datastore.Transaction) e
 	}
 
 	// Check the game round so we are not trying to cancel a settled round
-	gameRound, err := ts.ds.GetGameRound(ts.ctx, cancelTrans.PlayerIdentifier, *cancelTrans.ProviderRoundId)
+	gameRound, err := ts.ds.GetGameRound(ts.ctx, cancelTrans.PlayerIdentifier, *cancelTrans.ProviderRoundID)
 	if err != nil {
 		return err
 	}
@@ -166,7 +166,7 @@ func (ts *TransactionService) cancellation(cancelTrans *datastore.Transaction) e
 func (ts *TransactionService) deposit(depositTrans *datastore.Transaction) error {
 
 	// First check the game round status. Game round needs to exist and has to be open
-	gameRound, err := ts.ds.GetGameRound(ts.ctx, depositTrans.PlayerIdentifier, *depositTrans.ProviderRoundId)
+	gameRound, err := ts.ds.GetGameRound(ts.ctx, depositTrans.PlayerIdentifier, *depositTrans.ProviderRoundID)
 	if err != nil {
 		if errors.Is(err, datastore.EntryNotFoundError) {
 			return DepositNotMatched
@@ -228,12 +228,12 @@ func (ts *TransactionService) getPreviousTransaction(trans *datastore.Transactio
 	var err error
 	var trx transSortedByTime
 	var twinTrans *datastore.Transaction
-	trx, err = ts.ds.GetTransactionsById(ts.ctx, trans.ProviderTransactionId, trans.ProviderName)
+	trx, err = ts.ds.GetTransactionsByID(ts.ctx, trans.ProviderTransactionID, trans.ProviderName)
 	if err == nil && trx != nil {
 		for _, tx := range trx {
 			if tx.PlayerIdentifier != trans.PlayerIdentifier ||
-				tx.ProviderGameId != trans.ProviderGameId ||
-				utils.OrZeroValue(tx.ProviderRoundId) != utils.OrZeroValue(trans.ProviderRoundId) {
+				tx.ProviderGameID != trans.ProviderGameID ||
+				utils.OrZeroValue(tx.ProviderRoundID) != utils.OrZeroValue(trans.ProviderRoundID) {
 				return nil, DuplicateTransactionError
 			}
 		}

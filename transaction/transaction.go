@@ -37,7 +37,7 @@ func (ts *TransactionService) AddTransaction(t datastore.Transaction) (int, erro
 		return 0, err
 	} else if trans != nil {
 		// If exactly the same transaction already exists (trans-ID and trans-type), simply return
-		return trans.Id, nil
+		return trans.ID, nil
 	}
 
 	// Validate general transaction logic
@@ -48,7 +48,7 @@ func (ts *TransactionService) AddTransaction(t datastore.Transaction) (int, erro
 
 	// Check if game exist
 	if t.TransactionType != PROMODEPOSIT {
-		if _, err := ts.ds.GetGame(ts.ctx, t.ProviderGameId, t.ProviderName); err != nil {
+		if _, err := ts.ds.GetGame(ts.ctx, t.ProviderGameID, t.ProviderName); err != nil {
 			return 0, fmt.Errorf("%w - %s", GameError, err.Error())
 		}
 	}
@@ -64,18 +64,18 @@ func (ts *TransactionService) AddTransaction(t datastore.Transaction) (int, erro
 	if t.IsGameOver {
 		n := time.Now()
 		if err := ts.ds.EndGameRound(ts.ctx, datastore.GameRound{
-			ProviderName: t.ProviderName, ProviderGameId: t.ProviderGameId, ProviderRoundId: *t.ProviderRoundId, EndTime: &n,
+			ProviderName: t.ProviderName, ProviderGameID: t.ProviderGameID, ProviderRoundID: *t.ProviderRoundID, EndTime: &n,
 		}); err != nil {
 			return 0, err
 		}
-	} else if t.ProviderRoundId != nil {
+	} else if t.ProviderRoundID != nil {
 		if err := ts.ds.AddGameRound(ts.ctx, datastore.GameRound{
-			ProviderName: t.ProviderName, PlayerId: t.PlayerIdentifier, ProviderGameId: t.ProviderGameId, ProviderRoundId: *t.ProviderRoundId, StartTime: time.Now(), EndTime: nil,
+			ProviderName: t.ProviderName, PlayerID: t.PlayerIdentifier, ProviderGameID: t.ProviderGameID, ProviderRoundID: *t.ProviderRoundID, StartTime: time.Now(), EndTime: nil,
 		}); err != nil {
 			return 0, err
 		}
 	}
-	return t.Id, nil
+	return t.ID, nil
 }
 
 func (ts *TransactionService) updateAccountBalance(trans datastore.Transaction) error {

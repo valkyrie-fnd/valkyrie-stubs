@@ -12,19 +12,19 @@ const (
 	QueryProvider = "provider"
 )
 
-func (c Controller) registerMiddlewares(app fiber.Router, pamApiKey string, providerTokens map[string]string) {
-	app.Use(c.getCheckPamApiToken(pamApiKey))
+func (c Controller) registerMiddlewares(app fiber.Router, pamAPIKey string, providerTokens map[string]string) {
+	app.Use(c.getCheckPamAPIToken(pamAPIKey))
 	app.Use(c.getCheckPlayerToken(providerTokens))
 	// for `ctx.Params("playerId")` used in c.checkPlayerId to work, the middleware has to be registered on a
 	// prefix containing the path param
-	app.Use("/players/:playerId/+", c.checkPlayerId)
+	app.Use("/players/:playerId/+", c.checkPlayerID)
 	app.Use(c.checkProvider)
 }
 
-func (c Controller) getCheckPamApiToken(pamApiKey string) fiber.Handler {
+func (c Controller) getCheckPamAPIToken(pamAPIKey string) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		apiKey := ctx.GetReqHeaders()[fiber.HeaderAuthorization]
-		if apiKey == "" || strings.TrimPrefix(apiKey, "Bearer ") != pamApiKey {
+		if apiKey == "" || strings.TrimPrefix(apiKey, "Bearer ") != pamAPIKey {
 			return ctx.Status(http.StatusUnauthorized).JSON(BaseResponse{
 				Error: &PamError{
 					Code:    PAMERRAPITOKEN,
@@ -80,10 +80,10 @@ func (c Controller) checkProviderToken(ctx *fiber.Ctx, sessionToken string, prov
 	return ctx.Next()
 }
 
-func (c Controller) checkPlayerId(ctx *fiber.Ctx) error {
-	uriPlayerId := ctx.Params("playerId")
-	if uriPlayerId != "" {
-		_, err := c.dataStore.GetPlayer(ctx.UserContext(), uriPlayerId)
+func (c Controller) checkPlayerID(ctx *fiber.Ctx) error {
+	uriPlayerID := ctx.Params("playerId")
+	if uriPlayerID != "" {
+		_, err := c.dataStore.GetPlayer(ctx.UserContext(), uriPlayerID)
 		if err != nil {
 			return ctx.Status(http.StatusOK).JSON(BaseResponse{
 				Error: &PamError{

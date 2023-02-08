@@ -55,7 +55,7 @@ func (c Controller) GetSession(ctx context.Context, request GetSessionRequestObj
 			Language: account.Language,
 			PlayerId: account.PlayerIdentifier,
 			Token:    request.Params.XPlayerToken,
-			GameId:   session.GameId,
+			GameId:   session.GameID,
 		},
 		Status: OK,
 	}, nil
@@ -158,8 +158,8 @@ func (c Controller) GetGameRound(ctx context.Context, request GetGameRoundReques
 	}
 	return GetGameRound200JSONResponse{
 		Gameround: &GameRound{
-			ProviderGameId:  gameRound.ProviderGameId,
-			ProviderRoundId: gameRound.ProviderRoundId,
+			ProviderGameId:  gameRound.ProviderGameID,
+			ProviderRoundId: gameRound.ProviderRoundID,
 			StartTime:       gameRound.StartTime,
 			EndTime:         gameRound.EndTime,
 		},
@@ -182,12 +182,12 @@ func (c Controller) GetTransactions(ctx context.Context, request GetTransactions
 	// Prioritize ref. If not there - go for ID
 	if request.Params.ProviderBetRef != nil {
 		trx, err = c.dataStore.GetTransactionsByRef(ctx, *request.Params.ProviderBetRef, request.Params.Provider)
-		if len(trx) == 1 && trx[0].Id == 0 {
+		if len(trx) == 1 && trx[0].ID == 0 {
 			trx = nil
 		}
 	} else {
-		trx, err = c.dataStore.GetTransactionsById(ctx, *request.Params.ProviderTransactionId, request.Params.Provider)
-		if len(trx) == 1 && trx[0].Id == 0 {
+		trx, err = c.dataStore.GetTransactionsByID(ctx, *request.Params.ProviderTransactionId, request.Params.Provider)
+		if len(trx) == 1 && trx[0].ID == 0 {
 			trx = nil
 		}
 	}
@@ -224,17 +224,17 @@ func (c Controller) AddTransaction(ctx context.Context, request AddTransactionRe
 	}
 	ts := transaction.NewTransactionService(ctx, c.dataStore)
 
-	transactionId, err := ts.AddTransaction(datastore.Transaction{
+	transactionID, err := ts.AddTransaction(datastore.Transaction{
 		PlayerIdentifier:      request.PlayerId,
 		CashAmount:            float64(request.Body.CashAmount),
 		BonusAmount:           float64(request.Body.BonusAmount),
 		PromoAmount:           float64(request.Body.PromoAmount),
 		Currency:              request.Body.Currency,
 		TransactionType:       string(request.Body.TransactionType),
-		ProviderTransactionId: request.Body.ProviderTransactionId,
+		ProviderTransactionID: request.Body.ProviderTransactionId,
 		ProviderBetRef:        request.Body.ProviderBetRef,
-		ProviderGameId:        utils.OrZeroValue(request.Body.ProviderGameId),
-		ProviderRoundId:       request.Body.ProviderRoundId,
+		ProviderGameID:        utils.OrZeroValue(request.Body.ProviderGameId),
+		ProviderRoundID:       request.Body.ProviderRoundId,
 		ProviderName:          request.Params.Provider,
 		IsGameOver:            utils.OrZeroValue(request.Body.IsGameOver),
 		TransactionDateTime:   request.Body.TransactionDateTime,
@@ -259,11 +259,11 @@ func (c Controller) AddTransaction(ctx context.Context, request AddTransactionRe
 		}, nil
 	}
 
-	respTransId := strconv.Itoa(transactionId)
+	respTransID := strconv.Itoa(transactionID)
 	return AddTransaction200JSONResponse{
 		TransactionResult: &TransactionResult{
 			Balance:       balance,
-			TransactionId: &respTransId,
+			TransactionId: &respTransID,
 		},
 		Status: OK,
 	}, nil
@@ -284,10 +284,10 @@ func mapTransaction(provider string, transaction datastore.Transaction) Transact
 		BonusAmount:           Amount(transaction.BonusAmount),
 		PromoAmount:           Amount(transaction.PromoAmount),
 		TransactionDateTime:   time.Now(),
-		ProviderTransactionId: transaction.ProviderTransactionId,
+		ProviderTransactionId: transaction.ProviderTransactionID,
 		ProviderBetRef:        transaction.ProviderBetRef,
-		ProviderGameId:        &transaction.ProviderGameId,
-		ProviderRoundId:       transaction.ProviderRoundId,
+		ProviderGameId:        &transaction.ProviderGameID,
+		ProviderRoundId:       transaction.ProviderRoundID,
 		IsGameOver:            &isGameOver,
 	}
 }
