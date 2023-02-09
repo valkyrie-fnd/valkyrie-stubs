@@ -24,9 +24,9 @@ type ExtendedDatastore interface {
 	ClearSessionData()
 	AddSession(s Session)
 	AddPlayer(p Player)
-	UpdateAccount(playerId string, a Account) error
-	GetProviderApiKey(provider string) (ProviderApiKey, error)
-	GetPamApiToken() string
+	UpdateAccount(playerID string, a Account) error
+	GetProviderAPIKey(provider string) (ProviderAPIKey, error)
+	GetPamAPIToken() string
 	GetSessionTimeout() int
 	GetProviderTokens() map[string]string
 }
@@ -44,7 +44,7 @@ type DataStore interface {
 	// AddGameRound adds a gameround
 	AddGameRound(ctx context.Context, gr GameRound) error
 	// GetGame get the game with gameId for providerName
-	GetGame(ctx context.Context, gameId, providerName string) (*Game, error)
+	GetGame(ctx context.Context, gameID, providerName string) (*Game, error)
 	// GetAccount Gets the player account with specified currency
 	GetAccount(ctx context.Context, player, currency string) (*Account, error)
 	// GetPlayer Get player with id player
@@ -56,24 +56,23 @@ type DataStore interface {
 	// EndGameRound Ends specified gameround
 	EndGameRound(ctx context.Context, gr GameRound) error
 	// GetTransactionsById Get transactions with providerTransactionId for specified provider
-	GetTransactionsById(ctx context.Context, providerTransactionId, providerName string) ([]Transaction, error)
+	GetTransactionsByID(ctx context.Context, providerTransactionID, providerName string) ([]Transaction, error)
 	// GetTransactionsByRef Get transactions with providerBetRef for specified provider
 	GetTransactionsByRef(ctx context.Context, providerBetRef, providerName string) ([]Transaction, error)
 	// GetGameRound Gets gameround with roundId for player with playerId
-	GetGameRound(ctx context.Context, playerId, roundId string) (*GameRound, error)
+	GetGameRound(ctx context.Context, playerID, roundID string) (*GameRound, error)
 	// GetProvider gets provider with specified name
 	GetProvider(ctx context.Context, provider string) (*Provider, error)
 	// GetTransactionsByRoundId returns transactions for specified providerRoundId
-	GetTransactionsByRoundId(ctx context.Context, providerRoundId string) ([]Transaction, error)
+	GetTransactionsByRoundID(ctx context.Context, providerRoundID string) ([]Transaction, error)
 }
 
 type Player struct {
-	Id               int
 	PlayerIdentifier string `yaml:"playerIdentifier"`
+	ID               int
 }
 
 type Account struct {
-	Id               int
 	PlayerIdentifier string  `yaml:"playerIdentifier"`
 	Currency         string  `yaml:"currency"`
 	Country          string  `yaml:"country"`
@@ -82,37 +81,38 @@ type Account struct {
 	BonusAmount      float64 `yaml:"bonusAmount"`
 	PromoAmount      float64 `yaml:"promoAmount"`
 	IsBlocked        bool    `yaml:"isBlocked"`
+	ID               int
 }
 
 type Transaction struct {
-	Id                    int       `json:"id,omitempty"`
+	TransactionDateTime   time.Time `yaml:"transactionDateTime" json:"transactionDateTime"`
 	PlayerIdentifier      string    `yaml:"playerIdentifier" json:"playerIdentifier,omitempty"`
+	Currency              string    `json:"currency,omitempty"`
+	TransactionType       string    `yaml:"transactionType" json:"transactionType,omitempty"`
+	ProviderTransactionID string    `yaml:"providerTransactionId" json:"providerTransactionId,omitempty"`
+	ProviderBetRef        *string   `yaml:"providerBetRef" json:"providerBetRef,omitempty"`
+	ProviderGameID        string    `yaml:"providerGameId" json:"providerGameId,omitempty"`
+	ProviderRoundID       *string   `yaml:"providerRoundId" json:"providerRoundId,omitempty"`
+	ProviderName          string    `yaml:"providerName" json:"providerName"`
+	SessionKey            string    `yaml:"sessionKey" json:"sessionKey"`
 	CashAmount            float64   `yaml:"cashAmount" json:"cashAmount,omitempty"`
 	BonusAmount           float64   `yaml:"bonusAmount" json:"bonusAmount,omitempty"`
 	PromoAmount           float64   `yaml:"promoAmount" json:"promoAmount,omitempty"`
-	Currency              string    `json:"currency,omitempty"`
-	TransactionType       string    `yaml:"transactionType" json:"transactionType,omitempty"`
-	ProviderTransactionId string    `yaml:"providerTransactionId" json:"providerTransactionId,omitempty"`
-	ProviderBetRef        *string   `yaml:"providerBetRef" json:"providerBetRef,omitempty"`
-	ProviderGameId        string    `yaml:"providerGameId" json:"providerGameId,omitempty"`
-	ProviderRoundId       *string   `yaml:"providerRoundId" json:"providerRoundId,omitempty"`
-	ProviderName          string    `yaml:"providerName" json:"providerName"`
-	SessionKey            string    `yaml:"sessionKey" json:"sessionKey"`
+	ID                    int       `json:"id,omitempty"`
 	IsGameOver            bool      `yaml:"isGameOver" json:"isGameOver,omitempty"`
-	TransactionDateTime   time.Time `yaml:"transactionDateTime" json:"transactionDateTime"`
 }
 
 type Session struct {
+	Timestamp        time.Time
+	GameID           *string
 	Key              string
 	PlayerIdentifier string `yaml:"playerIdentifier"`
 	Provider         string
 	Currency         string
 	Country          string
 	Language         string
-	Timestamp        time.Time
 	// Timeout in seconds
 	Timeout int
-	GameId  *string
 }
 
 func (s *Session) IsExpired() bool {
@@ -120,26 +120,26 @@ func (s *Session) IsExpired() bool {
 }
 
 type Game struct {
-	Id             int
 	ProviderName   string `yaml:"providerName"`
-	ProviderGameId string `yaml:"providerGameId"`
+	ProviderGameID string `yaml:"providerGameId"`
+	ID             int
 }
 
 type GameRound struct {
-	ProviderName    string     `yaml:"providerName"`
-	ProviderGameId  string     `yaml:"providerGameId"`
-	ProviderRoundId string     `yaml:"providerRoundId"`
-	PlayerId        string     `yaml:"playerId"`
-	StartTime       time.Time  `yaml:"startTime"`
 	EndTime         *time.Time `yaml:"endTime"`
+	StartTime       time.Time  `yaml:"startTime"`
+	ProviderName    string     `yaml:"providerName"`
+	ProviderGameID  string     `yaml:"providerGameId"`
+	ProviderRoundID string     `yaml:"providerRoundId"`
+	PlayerID        string     `yaml:"playerId"`
 }
 
 type Provider struct {
-	ProviderId int `yaml:"providerId"`
 	Provider   string
+	ProviderID int `yaml:"providerId"`
 }
 
-type ProviderApiKey struct {
-	ApiKey   string `yaml:"apiKey"`
+type ProviderAPIKey struct {
+	APIKey   string `yaml:"apiKey"`
 	Provider string
 }

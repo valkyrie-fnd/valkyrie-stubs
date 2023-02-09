@@ -22,12 +22,12 @@ func NewValk(provider, baseURL, token string) *ValkClient {
 
 func (e *ValkClient) GameLaunch(game, player string) (*GameLaunchResponse, error) {
 	r := GameLaunchRequest{
-		PlayerId:       player,
+		PlayerID:       player,
 		Provider:       "Red Tiger",
 		SessionKey:     "ABC",
 		Casino:         "",
 		Currency:       "",
-		ExternalGameId: game,
+		ExternalGameID: game,
 	}
 	return post(e.url, "balance", e.authToken, r)
 }

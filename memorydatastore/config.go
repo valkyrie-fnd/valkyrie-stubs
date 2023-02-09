@@ -8,9 +8,10 @@ import (
 )
 
 type Config struct {
-	PamApiToken      string `yaml:"pamApiToken"`
+	SessionTimeout   *int   `yaml:"sessionTimeout,omitempty"`
+	PamAPIToken      string `yaml:"pamApiToken"`
 	Providers        []datastore.Provider
-	ProviderApiKeys  []datastore.ProviderApiKey `yaml:"providerApiKeys"`
+	ProviderAPIKeys  []datastore.ProviderAPIKey `yaml:"providerApiKeys"`
 	ProviderSessions []datastore.Session        `yaml:"providerSessions"`
 	Games            []datastore.Game
 	GameRounds       []datastore.GameRound `yaml:"gameRounds"`
@@ -18,11 +19,10 @@ type Config struct {
 	Players          []datastore.Player
 	Sessions         []datastore.Session
 	Transactions     []datastore.Transaction
-	SessionTimeout   *int `yaml:"sessionTimeout,omitempty"`
 }
 
 func ReadConfig(file string) (*Config, error) {
-	data, err := os.ReadFile(file)
+	data, err := os.ReadFile(file) //nolint:gosec //we do need to read the file
 	if err != nil {
 		return nil, err
 	}

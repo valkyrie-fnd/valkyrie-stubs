@@ -2,28 +2,26 @@
 package utils
 
 import (
+	"crypto/rand"
 	"fmt"
-	"math/rand"
+	"math/big"
 	"net"
-	"time"
 )
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
+var rndSize = big.NewInt(int64(len(letters)))
 
 func RandomString(n int) string {
 	b := make([]rune, n)
 	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
+		b[i] = letters[RandomInt()]
 	}
 	return string(b)
 }
 
 func RandomInt() int {
-	return rand.Int()
+	n, _ := rand.Int(rand.Reader, rndSize)
+	return int(n.Int64())
 }
 
 // Stack combines an array of errors into a single error via formatting.

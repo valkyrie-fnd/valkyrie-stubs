@@ -16,18 +16,18 @@ import (
 const redtigerTokenSize = 32
 
 type SessionRequest struct {
-	UserId   *string `json:"userId,omitempty"`
+	UserID   *string `json:"userId,omitempty"`
 	Currency *string `json:"currency,omitempty"`
 }
 
 type SessionResponse struct {
-	Success bool   `json:"success"`
 	Result  Result `json:"result"`
+	Success bool   `json:"success"`
 }
 
 type Result struct {
 	Token  string `json:"token"`
-	UserId string `json:"userId"`
+	UserID string `json:"userId"`
 }
 
 var Session = func(db datastore.ExtendedDatastore) fiber.Handler {
@@ -37,38 +37,38 @@ var Session = func(db datastore.ExtendedDatastore) fiber.Handler {
 			return err
 		}
 
-		var userId = utils.RandomString(10) // default generate userId
-		if req.UserId != nil {
-			userId = *req.UserId
+		var userID = utils.RandomString(10) // default generate userId
+		if req.UserID != nil {
+			userID = *req.UserID
 		}
 		var currency = "EUR" // default currency
 		if req.Currency != nil {
 			currency = *req.Currency
 		}
 
-		token := createPlayerAndSession(c.UserContext(), db, userId, currency)
+		token := createPlayerAndSession(c.UserContext(), db, userID, currency)
 
 		return c.Status(http.StatusOK).JSON(SessionResponse{
 			Success: true,
 			Result: Result{
 				Token:  token,
-				UserId: userId,
+				UserID: userID,
 			},
 		})
 	}
 }
 
-func createPlayerAndSession(ctx context.Context, ds datastore.ExtendedDatastore, playerId, currency string) string {
+func createPlayerAndSession(ctx context.Context, ds datastore.ExtendedDatastore, playerID, currency string) string {
 	sessionToken := utils.RandomString(redtigerTokenSize)
-	pla, err := ds.GetPlayer(ctx, playerId)
+	pla, err := ds.GetPlayer(ctx, playerID)
 	if err != nil {
-		ds.AddPlayer(datastore.Player{Id: utils.RandomInt(), PlayerIdentifier: playerId})
-		pla, _ = ds.GetPlayer(ctx, playerId)
+		ds.AddPlayer(datastore.Player{ID: utils.RandomInt(), PlayerIdentifier: playerID})
+		pla, _ = ds.GetPlayer(ctx, playerID)
 	}
-	acc, err := ds.GetAccount(ctx, playerId, currency)
+	acc, err := ds.GetAccount(ctx, playerID, currency)
 	if err != nil {
-		ds.AddAccount(datastore.Account{Id: utils.RandomInt(), PlayerIdentifier: playerId, Currency: currency, CashAmount: 1000, PromoAmount: 1000})
-		acc, _ = ds.GetAccount(ctx, playerId, currency)
+		ds.AddAccount(datastore.Account{ID: utils.RandomInt(), PlayerIdentifier: playerID, Currency: currency, CashAmount: 1000, PromoAmount: 1000})
+		acc, _ = ds.GetAccount(ctx, playerID, currency)
 	}
 	ds.AddSession(datastore.Session{
 		Key:              sessionToken,

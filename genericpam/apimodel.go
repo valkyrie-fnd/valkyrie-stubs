@@ -6,15 +6,15 @@ type GameLaunchResponse struct {
 
 // Operator game launch request
 type GameLaunchRequest struct {
-	PlayerId       string       `json:"playerId"`
+	LaunchConfig   LaunchConfig `json:"launchConfig"`
+	PlayerID       string       `json:"playerId"`
 	Provider       string       `json:"provider"`
 	SessionKey     string       `json:"sessionKey"`
-	ExternalGameId string       `json:"gameId"`
+	ExternalGameID string       `json:"gameId"`
 	Casino         string       `json:"casino"`
 	Country        string       `json:"country"`
 	Language       string       `json:"language"`
 	Currency       string       `json:"currency"`
-	LaunchConfig   LaunchConfig `json:"launchConfig"`
 }
 
 type LaunchConfig struct {

@@ -85,7 +85,7 @@ func hardErrorRoute(breakingErrors chan<- string) fiber.Handler {
 		code := c.Query("code")
 		if code != "" {
 			for _, e := range hardErrors {
-				if string(e) == code {
+				if e == code {
 					log.Info().Msgf("Queuing hard error: %s", e)
 					breakingErrors <- e
 					return c.Redirect("/broken")
