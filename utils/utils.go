@@ -3,20 +3,21 @@ package utils
 
 import (
 	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"math/big"
 	"net"
 )
 
-var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-var rndSize = big.NewInt(int64(len(letters)))
+var rndSize = big.NewInt(1 << 32)
 
 func RandomString(n int) string {
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letters[RandomInt()]
+	b := make([]byte, n)
+	_, err := rand.Read(b)
+	if err != nil {
+		panic(err)
 	}
-	return string(b)
+	return base64.RawURLEncoding.EncodeToString(b)
 }
 
 func RandomInt() int {
