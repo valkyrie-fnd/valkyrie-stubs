@@ -58,19 +58,19 @@ func OrDefault[T any](ptr *T, def T) T {
 }
 
 // GetFreePort returns a free open port that is ready to use.
-func GetFreePort() (int, error) {
+func GetFreePort() (int, string, error) {
 	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
 	if err != nil {
-		return 0, err
+		return 0, "", err
 	}
 
 	l, err := net.ListenTCP("tcp", addr)
 	if err != nil {
-		return 0, err
+		return 0, "", err
 	}
 
 	defer func() {
 		_ = l.Close()
 	}()
-	return l.Addr().(*net.TCPAddr).Port, nil
+	return l.Addr().(*net.TCPAddr).Port, l.Addr().String(), nil
 }
