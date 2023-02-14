@@ -3,11 +3,11 @@ package genericpam
 // Very thin wrapper around http client doing requests to the valkyrie, to stimulate tests
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/valkyrie-fnd/valkyrie-stubs/utils"
 )
 
 type ValkClient struct {
@@ -43,7 +43,7 @@ func post(base, path, token string, body interface{}) (*GameLaunchResponse, erro
 	if status != fiber.StatusOK {
 		return nil, fmt.Errorf("valkyrie/%s request failed with status [%v]: %s, Error: %s", path, status, string(b), err)
 	} else if err != nil {
-		return nil, utils.Stack(err, fmt.Errorf("evo/%s request failed: %s", path, b))
+		return nil, errors.Join(err...)
 	}
 
 	return &resp, nil

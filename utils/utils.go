@@ -4,7 +4,6 @@ package utils
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"fmt"
 	"math/big"
 	"net"
 )
@@ -23,15 +22,6 @@ func RandomString(n int) string {
 func RandomInt() int {
 	n, _ := rand.Int(rand.Reader, rndSize)
 	return int(n.Int64())
-}
-
-// Stack combines an array of errors into a single error via formatting.
-func Stack(errs []error, target error) error {
-	if len(errs) == 0 {
-		return target
-	}
-
-	return Stack(errs[1:], fmt.Errorf("%s %w", target, errs[0])) //nolint
 }
 
 // Ptr returns the pointer to an argument, useful for string literals.
