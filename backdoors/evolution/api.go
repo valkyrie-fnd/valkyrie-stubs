@@ -32,7 +32,7 @@ type sidResponse struct {
 var SID = func(eds datastore.ExtendedDatastore) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Get expected Evolution API Key
-		res, err := eds.GetProviderAPIKey("Evolution")
+		res, err := eds.GetProviderAPIKey("evolution")
 		if err != nil {
 			log.Fatalf("evolution api key not configured in datastore: %v", err)
 		}
@@ -76,7 +76,7 @@ func createPlayerAndSession(ctx context.Context, eds datastore.ExtendedDatastore
 	eds.AddSession(datastore.Session{
 		Key:              sessionToken,
 		PlayerIdentifier: pla.PlayerIdentifier,
-		Provider:         "Evolution",
+		Provider:         "evolution",
 		Currency:         acc.Currency,
 		Country:          acc.Country,
 		Language:         acc.Language,

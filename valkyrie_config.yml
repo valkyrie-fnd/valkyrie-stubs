@@ -1,14 +1,14 @@
 logging:
   level: info
 providers:
-  - name: Evolution
+  - name: evolution
     base_path: "/evolution"
     auth:
       casino_key: ${EVO_CASINO_KEY}
       api_key: ${EVO_API_TOKEN} # Token for incoming requests
       casino_token: ${EVO_CASINO_API_TOKEN} # Token for outgoing requests
     url: ${EVO_BASE_URL}
-  - name: Red Tiger
+  - name: redtiger
     base_path: "/rt"
     url: ${RT_BASE_URL}
     auth:
