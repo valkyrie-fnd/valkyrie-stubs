@@ -31,7 +31,7 @@ func Stack(errs []error, target error) error {
 		return target
 	}
 
-	return Stack(errs[1:], fmt.Errorf("%s %w", target, errs[0]))
+	return Stack(errs[1:], fmt.Errorf("%s %w", target, errs[0])) //nolint
 }
 
 // Ptr returns the pointer to an argument, useful for string literals.

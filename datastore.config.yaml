@@ -1,19 +1,19 @@
 pamApiToken: pam-api-token
 
 providers:
-  - provider: Red Tiger
+  - provider: redtiger
     providerId: 2
-  - provider: Evolution
+  - provider: evolution
     providerId: 3
 
 providerApiKeys:
-  - provider: Evolution
+  - provider: evolution
     apiKey: evo-api-key
-  - provider: Red Tiger
+  - provider: redtiger
     apiKey: RT_API_KEY
 
 providerSessions:
-  - provider: Red Tiger
+  - provider: redtiger
     key: RECON_TOKEN
 
 games:
@@ -25,22 +25,22 @@ games:
 gameRounds:
   - providerGameId: vctlz20yfnmp1ylr
     providerRoundId: vVJBwYIUc5
-    providerName: Evolution
+    providerName: evolution
     playerId: 2000001
     startTime: 2006-01-02T15:04:05Z
   - providerGameId: 100
     providerRoundId: abc
-    providerName: Red Tiger
+    providerName: redtiger
     playerId: 1
     startTime: 2006-01-02T15:04:05Z
   - providerGameId: 1001
     providerRoundId: abcd
-    providerName: Red Tiger
+    providerName: redtiger
     playerId: 1000001
     startTime: 2006-01-02T15:04:05Z
   - providerGameId: DragonsLuck
     providerRoundId: 456
-    providerName: Red Tiger
+    providerName: redtiger
     startTime: 2006-01-02T15:04:05Z
 
 players:
@@ -90,37 +90,37 @@ accounts:
 sessions:
   - key: ABC
     playerIdentifier: 1
-    provider: Red Tiger
+    provider: redtiger
     currency: SEK
     country: SE
     language: sv
   - key: pelle1-key-needs-to-be-at-least-32-chars
     playerIdentifier: 1000001
-    provider: Red Tiger
+    provider: redtiger
     currency: USD
     country: SE
     language: sv
   - key: A7eK4bOmC1Ux-hbvdr4bRckEqBPDAGj06aO3bLyAR_g
     playerIdentifier: 2000001
-    provider: Evolution
+    provider: evolution
     currency: SEK
     country: SE
     language: sv
   - key: C1eK4bOmC1Ux-hbvdr4bRckEqBPDAGj06aO3bLyARab
     playerIdentifier: 5000001
-    provider: Evolution
+    provider: evolution
     currency: EUR
     country: SE
     language: sv
   - key: B7eK4bOmC1Ux-hbvdr4bRckEqBPDAGj06aO3bLyAR_g
     playerIdentifier: 5000002
-    provider: Evolution
+    provider: evolution
     currency: EUR
     country: SE
     language: sv
   - key: DEF
     playerIdentifier: 5000001
-    provider: Evolution
+    provider: evolution
     currency: EUR
     country: SE
     language: sv

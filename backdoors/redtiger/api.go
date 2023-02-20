@@ -73,7 +73,7 @@ func createPlayerAndSession(ctx context.Context, ds datastore.ExtendedDatastore,
 	ds.AddSession(datastore.Session{
 		Key:              sessionToken,
 		PlayerIdentifier: pla.PlayerIdentifier,
-		Provider:         "Red Tiger",
+		Provider:         "redtiger",
 		Currency:         acc.Currency,
 		Country:          acc.Country,
 		Language:         acc.Language,
