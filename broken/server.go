@@ -1,11 +1,5 @@
-// Package broken provides a stub server which can be used to test error handling
+//Package broken provides a stub server which can be used to test error handling
 
-/*
-	TODO:
-
-- build scenario definitions like "next Deposit will timeout", use that for rendering cards
-- for displaying status use to channels one for UI and one for injecting errors
-*/
 package broken
 
 import (

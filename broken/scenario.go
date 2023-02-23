@@ -1,7 +1,6 @@
 package broken
 
 import (
-	"encoding/json"
 	"fmt"
 	"regexp"
 
@@ -47,29 +46,12 @@ var predefinedScenarios = map[string]scenario{
 	},
 }
 
-/*
-Bet is rejected due to no response from licensee
-
-configure no response on
-debit request
-place bet
-
-bet rejection message is present in game UI
-refresh the page in couple of min after bet placement - balance is same as before. if not - check in logs retries on debit are finished.
-ensure that transaction is absent in settlement request "finishedTransactions" list
-*/
-
 func (s *scenario) match(r *fiber.Request) bool {
 	return routeMatch(s.PathPattern, r.RequestURI())
 }
 
 func routeMatch(pat *regexp.Regexp, uri []byte) bool {
 	return pat.Match(uri)
-}
-
-func (s *scenario) JSON() string {
-	bs, _ := json.Marshal(s)
-	return string(bs)
 }
 
 func (s *scenario) String() string {
