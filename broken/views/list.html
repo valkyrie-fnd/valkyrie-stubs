@@ -12,48 +12,56 @@
       crossorigin="anonymous"
     />
     <style>
-      .btn.active, .btn:active {
+      .btn.active,
+      .btn:active {
         background-color: #e67416 !important;
       }
     </style>
   </head>
+  {{$scenarios := .scenarios}} {{$hardFaults := .hardFaults}}
   <body>
-    <div class="container-fluid">
-      <div class="mx-auto" style="width: 200px">
-        <h2>PAM Errors</h2>
-        <ul class="list-group list-group-flush">
-          {{range .softErrors}}
-          <li class="list-group-item">
-            <form action="error">
-              <input type="hidden" name="code" value="{{ .Code }}" />
-              <input
-                type="submit"
-                value="{{ .Code }} {{ .Message }}"
-                class="btn btn-outline-warning"
-                onclick="this.classList.add('active');"
-              />
-            </form>
-          </li>
-          {{end}}
-        </ul>
+    <div class="container">
+      <div class="row mx-auto" style="width: 300px;">
+        <h1>Error Injection</h1>
       </div>
-      <div class="mx-auto" style="width: 200px">
-        <h2>Hard Errors</h2>
-        <ul class="list-group list-group-flush">
-          {{range .hardErrors}}
-          <li class="list-group-item">
-            <form action="hard">
-              <input type="hidden" name="code" value="{{ . }}" />
-              <input
-                type="submit"
-                value="{{ . }}"
-                class="btn btn-outline-danger"
-                onclick="this.classList.add('active');"
-              />
-            </form>
-          </li>
-          {{end}}
-        </ul>
+      <div class="row justify-content-center">
+        {{range $name, $s := $scenarios}}
+        <div class="card col-sm-6 mx-1 mb-2" style="width: 18rem">
+          <div class="card-body">
+            <h5 class="card-title">{{ $s.Title }}</h5>
+            <p class="card-text">{{ $s.Description }}</p>
+            <div class="card-footer">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  <form method="post" action=".">
+                    <input type="hidden" name="scenario" value="{{ $name }}" />
+                    <input
+                      type="submit"
+                      value="Undefined Error"
+                      class="btn btn-outline-warning"
+                      onclick="this.classList.add('active');"
+                    />
+                  </form>
+                </li>
+                {{range $err := $hardFaults}}
+                <li class="list-group-item">
+                  <form method="post" action=".">
+                    <input type="hidden" name="hard" value="{{ $err }}" />
+                    <input type="hidden" name="scenario" value="{{ $name }}" />
+                    <input
+                      type="submit"
+                      value="{{ $err }}"
+                      class="btn btn-outline-danger"
+                      onclick="this.classList.add('active');"
+                    />
+                  </form>
+                </li>
+                {{end}}
+              </ul>
+            </div>
+          </div>
+        </div>
+        {{end}}
       </div>
     </div>
     <script

@@ -17,7 +17,7 @@ import (
 	"github.com/valkyrie-fnd/valkyrie-stubs/memorydatastore"
 )
 
-var pam = "genericpam"
+var pam = "broken"
 var operationMode = "default"
 var addr = ":8080"
 var backdoorPort = "3000"
