@@ -1,5 +1,4 @@
-//Package broken provides a stub server which can be used to test error handling
-
+// Package broken provides a stub server which can be used to test error handling
 package broken
 
 import (
