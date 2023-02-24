@@ -1,6 +1,6 @@
 module github.com/valkyrie-fnd/valkyrie-stubs
 
-go 1.19
+go 1.20
 
 require (
 	github.com/four-fingers/oapi-codegen v0.0.0-20221219135408-9237c9743c67
