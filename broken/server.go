@@ -1,23 +1,18 @@
-// Package broken provides a stub server which can be used to test error handling
+//Package broken provides a stub server which can be used to test error handling
+
 package broken
 
 import (
 	"os"
 
 	"github.com/rs/zerolog/log"
-	"github.com/valkyrie-fnd/valkyrie-stubs/genericpam"
 	"github.com/valkyrie-fnd/valkyrie-stubs/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html"
 )
 
-var softErrors = []genericpam.PamError{
-	{Code: genericpam.PAMERRACCNOTFOUND, Message: "Account not found"},
-	{Code: genericpam.PAMERRTIMEOUT, Message: "Timeout"},
-}
-
-var hardErrors = []string{"timeout 5s", "connection close"}
+var hardFaults = []string{"timeout 5s", "connection close"}
 
 func RunServer(addr string, regularRoutes func(fiber.Router)) *fiber.App {
 	hostname, _ := os.Hostname()
@@ -32,27 +27,26 @@ func RunServer(addr string, regularRoutes func(fiber.Router)) *fiber.App {
 		Views:                 engine,
 	},
 		func(app *fiber.App) {
+			errorCases := make(chan scenario, 2)
+			signal := make(chan any)
 
-			pamErrors := make(chan genericpam.PamError)
-			breakingErrors := make(chan string)
 			app.Hooks().OnShutdown(func() error {
-				close(pamErrors)
-				close(breakingErrors)
+				close(errorCases)
+				close(signal)
 				return nil
 			})
 
-			app.Group("/broken").Get("/", func(c *fiber.Ctx) error {
-				return c.Render("list", fiber.Map{
-					"softErrors": softErrors,
-					"hardErrors": hardErrors,
-				})
-			}).
-				Get("error", softErrorRoute(pamErrors)).
-				Get("hard", hardErrorRoute(breakingErrors))
+			app.Group("/broken").
+				Get("/", func(c *fiber.Ctx) error {
+					return c.Render("list", fiber.Map{
+						"scenarios":  predefinedScenarios,
+						"hardFaults": hardFaults,
+					})
+				}).
+				Post("/", addError(errorCases, signal))
 
 			// Setup middleware which injects errors
-			app.Use(injectPAMError(pamErrors))
-			app.Use(injectBreakage(breakingErrors))
+			app.Use(injectFault(errorCases, signal))
 
 			// Add regular routes
 			regularRoutes(app)
@@ -62,59 +56,45 @@ func RunServer(addr string, regularRoutes func(fiber.Router)) *fiber.App {
 	return app
 }
 
-func softErrorRoute(pamErrors chan<- genericpam.PamError) fiber.Handler {
+func addError(q chan<- scenario, signal chan any) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		code := c.Query("code")
-		if code != "" {
-			for _, e := range softErrors {
-				if string(e.Code) == code {
-					log.Info().Msgf("Queuing PAM error: %s", e)
-					pamErrors <- e
-					return c.Redirect("/broken")
-				}
+		hard := c.FormValue("hard")
+		scenarioName := c.FormValue("scenario")
+
+		if scenarioName != "" {
+			s := predefinedScenarios[scenarioName]
+
+			if hard != "" {
+				s.HardError = hard
 			}
-		} else {
-			return c.SendStatus(fiber.StatusBadRequest)
+
+			log.Info().Msgf("Queuing error: %s", s)
+
+			q <- s
+
+			<-signal // wait for completion signal
 		}
+
 		return c.Redirect("/broken")
 	}
 }
 
-func hardErrorRoute(breakingErrors chan<- string) fiber.Handler {
+func injectFault(q chan scenario, signal chan<- any) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		code := c.Query("code")
-		if code != "" {
-			for _, e := range hardErrors {
-				if e == code {
-					log.Info().Msgf("Queuing hard error: %s", e)
-					breakingErrors <- e
-					return c.Redirect("/broken")
-				}
+		select {
+		case pe := <-q:
+			if !pe.match(c.Request()) {
+				// This error is not for this path
+				q <- pe
+				return c.Next()
 			}
-		} else {
-			return c.SendStatus(fiber.StatusBadRequest)
-		}
-		return c.Redirect("/broken")
-	}
-}
-
-func injectPAMError(q chan genericpam.PamError) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		select {
-		case err := <-q:
-			log.Info().Str("error", err.Message).Msg("Injecting error")
-			return c.Status(500).JSON(err)
-		default:
-			return c.Next()
-		}
-	}
-}
-
-func injectBreakage(q chan string) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		select {
-		case err := <-q:
-			return breakage(c, err)
+			log.Info().Msgf("Injecting fault: %s", pe)
+			signal <- nil
+			if pe.HardError != "" {
+				return breakage(c, pe.HardError)
+			} else {
+				return c.Status(500).JSON(pe.Response)
+			}
 		default:
 			return c.Next()
 		}
