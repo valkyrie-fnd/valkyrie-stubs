@@ -2,9 +2,11 @@
 package broken
 
 import (
+	"net/http"
 	"os"
 
 	"github.com/rs/zerolog/log"
+	"github.com/valkyrie-fnd/valkyrie-stubs/broken/views"
 	"github.com/valkyrie-fnd/valkyrie-stubs/utils"
 
 	"github.com/gofiber/fiber/v2"
@@ -18,7 +20,7 @@ func RunServer(addr string, regularRoutes func(fiber.Router)) *fiber.App {
 	log.Info().Msgf("Starting broken stub server. Admin on http://%s%s/broken", hostname, addr)
 
 	// Initialize standard Go html template engine
-	engine := html.New("./broken/views", ".html")
+	engine := html.NewFileSystem(http.FS(views.Content), ".html")
 
 	app := utils.HangingStart(addr, fiber.Config{
 		DisableStartupMessage: true,
