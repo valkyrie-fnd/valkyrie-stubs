@@ -39,7 +39,7 @@ The project can run standalone using the built binary:
 ./valkyrie-stubs
 ```
 
-There is also a `docker-compose.yml` available which will start **valkyrie** together with **valkyrie-stubs** 
+There is also a `docker-compose.yml` available in the repository root which will start **valkyrie** together with **valkyrie-stubs** 
 acting as PAM:
 
 ```bash
