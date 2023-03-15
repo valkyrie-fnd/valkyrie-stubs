@@ -49,6 +49,13 @@ docker-compose up
 Valkyrie stubs may also be used as a testing library, for example by starting a genericpam server programmatically as
 in this Valkyrie test suite [example](https://github.com/valkyrie-fnd/valkyrie/blob/main/provider/internal/test/suite.go#L51).
 
+### Test configuration
+The stubs contain an in-memory database. To configure the database, edit the datastore [config file](./datastore.config.yaml). Make sure that the appropriate player, provider, provider API key and game are present in the config. Otherwise add the values.
+
+To configure the valkyre module for the test, make sure that the provider is present [here](./valkyrie_config.yml) too.
+
+*Note*: The config files mentioned in this section are included in the image in the docker build, so there is no point changing them in runtime. If stubs is built and run as a go binary, the config files should be present in the execution directory and can be updated between each stop and start.
+
 ### Running tests with fault injection using Broken
 
 When starting the stubs in standalone mode a web interface is available at http://localhost:8080/broken. 
@@ -57,15 +64,26 @@ There some predefined error scenarios can be triggered, like connection issues.
 
 In order to extend the available cases take a look at [scenarios.go](./broken/scenario.go).
 
+Once started, use the web interface to inject an appropriate error. If repeated errors (of the same kind) are wanted, start as many instances of the web interface as wanted and inject the fault once per instance.
+
+Each fault will be triggered and subsequently reset by each wallet request (i.e. balance or transaction). To make sure the errors work as intended, the curl calls below might become handy. For proper game tests, run stubs together with valkyrie as described above, obtain a session token (see curl below) and fire wallet requests towards the appropriate provider endpoints.
+
 ### A few curls
 
-Create a session for the Evolution provider using the backdoor HTTP API:
+*Note*: The curl commands in these examples are executed directly towards the PAM. To test a provider game together with Valkyrie and valkyrie-stubs, provider specific endpoints are used.
+
+Create a session for test using the backdoor HTTP API (note that this session token can be used in provider tests as well):
 
 ```bash
+# Evolution specific
 SID=$(curl -s -H 'Content-type:application/json' -d '{"sid":"sid2", "userId":"5000001"}' 'localhost:3000/backdoors/evolution/sid?authToken=evo-api-key' | jq -r '.sid')
+
+# General
+SID=$(curl -s -H 'Content-type:application/json' -d '{"provider":"caleta", "userId":"5000001"}' 'localhost:3000/backdoors/session' | jq -r '.result.token')
+
 ```
 
-Get the balance using this session from the genericpam stub:
+Get the balance using the first session (in this example) from the genericpam stub:
 
 ```shell
 curl -i -H "Authorization:Bearer pam-api-token" \

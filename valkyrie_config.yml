@@ -13,6 +13,11 @@ providers:
     url: ${RT_BASE_URL}
     auth:
       api_key: ${RT_API_KEY}
+  - name: caleta
+    base_path: "/caleta"
+    url: ${CALETA_BASE_URL}
+    auth:
+      api_key: ${CALETA_API_KEY}
 pam:
   name: generic # check /pam-folder for available PAMs
   url: ${PAM_URL}

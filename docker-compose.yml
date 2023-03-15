@@ -22,5 +22,6 @@ services:
       PAM_URL: http://stubs:8080
       PAM_API_KEY: pam-api-token
       VALK_PROFILES: local
+      CALETA_API_KEY: caleta-api-token
     volumes:
       - ./valkyrie_config.yml:/app/valkyrie_config.yml

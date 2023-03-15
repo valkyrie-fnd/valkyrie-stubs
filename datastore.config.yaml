@@ -5,12 +5,16 @@ providers:
     providerId: 2
   - provider: evolution
     providerId: 3
+  - provider: caleta
+    providerId: 4
 
 providerApiKeys:
   - provider: evolution
     apiKey: evo-api-key
   - provider: redtiger
     apiKey: RT_API_KEY
+  - provider: caleta
+    apiKey: caleta-api-token
 
 providerSessions:
   - provider: redtiger
@@ -21,6 +25,7 @@ games:
   - providerGameId: 100
   - providerGameId: 1001
   - providerGameId: DragonsLuck
+  - providerGameId: cg_magicforest
 
 gameRounds:
   - providerGameId: vctlz20yfnmp1ylr
