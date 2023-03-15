@@ -54,7 +54,7 @@ The stubs contain an in-memory database. To configure the database, edit the dat
 
 To configure the valkyre module for the test, make sure that the provider is present [here](./valkyrie_config.yml) too.
 
-*Note*: The config files mentioned in this section are included in the image in the docker build, so there is no point changing them in runtime. If stubs is built and run as a go binary, the config files should be present in the execution directory and can be updated between each stop and start.
+*Note*: The config files mentioned in this section are included in the image in the docker build, so there is no point in changing them in runtime. If stubs is built and run as a go binary, the config files should be present in the execution directory and can be updated between each stop and start.
 
 ### Running tests with fault injection using Broken
 
@@ -64,7 +64,7 @@ There some predefined error scenarios can be triggered, like connection issues.
 
 In order to extend the available cases take a look at [scenarios.go](./broken/scenario.go).
 
-Once started, use the web interface to inject an appropriate error. If repeated errors (of the same kind) are wanted, start as many instances of the web interface as wanted and inject the fault once per instance.
+Once started, use the web interface to inject an appropriate error. If repeated errors (of the same kind) are wanted, start as many tabs of the web interface as wanted and inject the fault once per tab.
 
 Each fault will be triggered and subsequently reset by each wallet request (i.e. balance or transaction). To make sure the errors work as intended, the curl calls below might become handy. For proper game tests, run stubs together with valkyrie as described above, obtain a session token (see curl below) and fire wallet requests towards the appropriate provider endpoints.
 
