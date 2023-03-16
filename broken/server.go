@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/rs/zerolog/log"
+
 	"github.com/valkyrie-fnd/valkyrie-stubs/broken/views"
 	"github.com/valkyrie-fnd/valkyrie-stubs/utils"
 
@@ -17,7 +18,7 @@ var hardFaults = []string{"timeout 5s", "connection close"}
 
 func RunServer(addr string, regularRoutes func(fiber.Router)) *fiber.App {
 	hostname, _ := os.Hostname()
-	log.Info().Msgf("Starting broken stub server. Admin on http://%s%s/broken", hostname, addr)
+	log.Info().Msgf("Starting broken stub server. Admin on http://%s%s/broken/", hostname, addr)
 
 	// Initialize standard Go html template engine
 	engine := html.NewFileSystem(http.FS(views.Content), ".html")
@@ -37,14 +38,14 @@ func RunServer(addr string, regularRoutes func(fiber.Router)) *fiber.App {
 				return nil
 			})
 
-			app.Group("/broken").
-				Get("/", func(c *fiber.Ctx) error {
-					return c.Render("list", fiber.Map{
-						"scenarios":  predefinedScenarios,
-						"hardFaults": hardFaults,
-					})
-				}).
-				Post("/", addError(errorCases, signal))
+			bg := app.Group("/broken")
+			bg.Get("/", func(c *fiber.Ctx) error {
+				return c.Render("list", fiber.Map{
+					"scenarios":  predefinedScenarios,
+					"hardFaults": hardFaults,
+				})
+			})
+			bg.Post("/", addError(errorCases, signal))
 
 			// Setup middleware which injects errors
 			app.Use(injectFault(errorCases, signal))
