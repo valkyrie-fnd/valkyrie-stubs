@@ -29,7 +29,7 @@ func RunServer(addr string, regularRoutes func(fiber.Router)) *fiber.App {
 		Views:                 engine,
 	},
 		func(app *fiber.App) {
-			errorCases := make(chan scenario, 2)
+			errorCases := make(chan scenario, 256)
 			signal := make(chan any)
 
 			app.Hooks().OnShutdown(func() error {
@@ -70,14 +70,17 @@ func addError(q chan<- scenario, signal chan any) fiber.Handler {
 				s.HardError = hard
 			}
 
-			log.Info().Msgf("Queuing error: %s", s)
+			select {
+			case q <- s:
+				log.Info().Msgf("Queued error: %s", s)
+				<-signal // wait for completion signal
+			default:
+				log.Warn().Msg("Unable to queue error, channel full")
+			}
 
-			q <- s
-
-			<-signal // wait for completion signal
 		}
 
-		return c.Redirect("/broken")
+		return c.Redirect("/broken/")
 	}
 }
 
