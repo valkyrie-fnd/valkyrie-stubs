@@ -68,7 +68,7 @@ Once started, use the web interface to inject an appropriate error. If repeated 
 
 Each fault will be triggered and subsequently reset by each wallet request (i.e. balance or transaction). To make sure the errors work as intended, the curl calls below might become handy. For proper game tests, run stubs together with valkyrie as described above, obtain a session token (see curl below) and fire wallet requests towards the appropriate provider endpoints.
 
-Expected outcome of the tree boiler plate scenarios provided for balance and withdrawal requests are:
+Expected outcome of the three boilerplate scenarios provided for balance and withdrawal requests are:
 * Requests directly to stubs PAM
   * *Undefined Error* - 500 Internal Server Error. Body: {"error":{"code":"PAM_ERR_UNDEFINED","message":"forced error"},"status":"ERROR"}
   * *Timeout 5s* - 408 Request Timeout. Body: N/A
