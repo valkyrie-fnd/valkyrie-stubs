@@ -5,6 +5,7 @@ import (
 	"regexp"
 
 	"github.com/gofiber/fiber/v2"
+
 	"github.com/valkyrie-fnd/valkyrie-stubs/genericpam"
 )
 
@@ -21,7 +22,7 @@ var predefinedScenarios = map[string]scenario{
 	"bet_fails": {
 		Title:          "Withdrawal fails",
 		Description:    "Next withdrawal/bet/debit is rejected",
-		PathPattern:    regexp.MustCompile(`^/players/.*/transactions`),
+		PathPattern:    regexp.MustCompile(`/players/.*/transactions$`),
 		RequestPattern: regexp.MustCompile(`"transactionType":\s?"WITHDRAW"`),
 		Response: genericpam.AddTransactionResponse{
 			Status: genericpam.ERROR,
@@ -34,7 +35,7 @@ var predefinedScenarios = map[string]scenario{
 	"balance_fails": {
 		Title:          "Balance fails",
 		Description:    "Next balance request fails",
-		PathPattern:    regexp.MustCompile(`^/players/.*/balance`),
+		PathPattern:    regexp.MustCompile(`/players/.*/balance$`),
 		RequestPattern: regexp.MustCompile(``),
 		Response: genericpam.AddTransactionResponse{
 			Status: genericpam.ERROR,
@@ -47,7 +48,7 @@ var predefinedScenarios = map[string]scenario{
 }
 
 func (s *scenario) match(r *fiber.Request) bool {
-	return routeMatch(s.PathPattern, r.RequestURI())
+	return routeMatch(s.PathPattern, r.URI().Path())
 }
 
 func routeMatch(pat *regexp.Regexp, uri []byte) bool {

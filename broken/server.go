@@ -29,12 +29,10 @@ func RunServer(addr string, regularRoutes func(fiber.Router)) *fiber.App {
 		Views:                 engine,
 	},
 		func(app *fiber.App) {
-			errorCases := make(chan scenario, 2)
-			signal := make(chan any)
+			errorCases := make(chan scenario, 256)
 
 			app.Hooks().OnShutdown(func() error {
 				close(errorCases)
-				close(signal)
 				return nil
 			})
 
@@ -45,10 +43,10 @@ func RunServer(addr string, regularRoutes func(fiber.Router)) *fiber.App {
 					"hardFaults": hardFaults,
 				})
 			})
-			bg.Post("/", addError(errorCases, signal))
+			bg.Post("/", addError(errorCases))
 
 			// Setup middleware which injects errors
-			app.Use(injectFault(errorCases, signal))
+			app.Use(injectFault(errorCases))
 
 			// Add regular routes
 			regularRoutes(app)
@@ -58,7 +56,7 @@ func RunServer(addr string, regularRoutes func(fiber.Router)) *fiber.App {
 	return app
 }
 
-func addError(q chan<- scenario, signal chan any) fiber.Handler {
+func addError(q chan<- scenario) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		hard := c.FormValue("hard")
 		scenarioName := c.FormValue("scenario")
@@ -70,18 +68,20 @@ func addError(q chan<- scenario, signal chan any) fiber.Handler {
 				s.HardError = hard
 			}
 
-			log.Info().Msgf("Queuing error: %s", s)
+			select {
+			case q <- s:
+				log.Info().Msgf("Queued error: %s", s)
+			default:
+				log.Warn().Msg("Unable to queue error, channel full")
+			}
 
-			q <- s
-
-			<-signal // wait for completion signal
 		}
 
-		return c.Redirect("/broken")
+		return c.Redirect("/broken/")
 	}
 }
 
-func injectFault(q chan scenario, signal chan<- any) fiber.Handler {
+func injectFault(q chan scenario) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		select {
 		case pe := <-q:
@@ -91,7 +91,6 @@ func injectFault(q chan scenario, signal chan<- any) fiber.Handler {
 				return c.Next()
 			}
 			log.Info().Msgf("Injecting fault: %s", pe)
-			signal <- nil
 			if pe.HardError != "" {
 				return breakage(c, pe.HardError)
 			} else {
