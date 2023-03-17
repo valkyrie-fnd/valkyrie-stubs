@@ -68,6 +68,18 @@ Once started, use the web interface to inject an appropriate error. If repeated 
 
 Each fault will be triggered and subsequently reset by each wallet request (i.e. balance or transaction). To make sure the errors work as intended, the curl calls below might become handy. For proper game tests, run stubs together with valkyrie as described above, obtain a session token (see curl below) and fire wallet requests towards the appropriate provider endpoints.
 
+Expected outcome of the tree boiler plate scenarios provided for balance and withdrawal requests are:
+* Requests directly to stubs PAM
+  * *Undefined Error* - 500 Internal Server Error. Body: {"error":{"code":"PAM_ERR_UNDEFINED","message":"forced error"},"status":"ERROR"}
+  * *Timeout 5s* - 408 Request Timeout. Body: N/A
+  * *Connection close* - No response
+* Requests to provider endpoints (Evolution in this example)
+  * *Undefined Error* - 200 OK. Body: {"status":"UNKNOWN_ERROR","balance":0.000000,"bonus":0.000000,"uuid":"123"}
+  * *Timeout 5s* - 200 OK. Body: {"status":"UNKNOWN_ERROR","balance":0.000000,"bonus":0.000000,"uuid":"123"}
+  * *Connection close* - 200 OK. Body: {"status":"UNKNOWN_ERROR","balance":0.000000,"bonus":0.000000,"uuid":"123"}
+
+*Note*: To trigger the connection close error, two instances of broken need to be activated. Valkyrie provider software performs one retry in case of connection close error.
+
 ### A few curls
 
 *Note*: The curl commands in these examples are executed directly towards the PAM. To test a provider game together with Valkyrie and valkyrie-stubs, provider specific endpoints are used.
