@@ -22,7 +22,7 @@ func HangingStart(adr string, cfg fiber.Config, rt Routing) *fiber.App {
 	// register startup listener
 	var wg sync.WaitGroup
 	wg.Add(1)
-	app.Hooks().OnListen(func() error {
+	app.Hooks().OnListen(func(_ fiber.ListenData) error {
 		wg.Done()
 		return nil
 	})
