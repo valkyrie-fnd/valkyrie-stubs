@@ -49,7 +49,7 @@ func (ts *TransactionService) AddTransaction(t datastore.Transaction) (int, erro
 	// Check if game exist
 	if t.TransactionType != PROMODEPOSIT {
 		if _, err := ts.ds.GetGame(ts.ctx, t.ProviderGameID, t.ProviderName); err != nil {
-			return 0, fmt.Errorf("%w - %s", GameError, err.Error()) //nolint
+			return 0, fmt.Errorf("%w - %s", GameError, err.Error())
 		}
 	}
 
